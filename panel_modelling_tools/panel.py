@@ -27,16 +27,24 @@ class VIEW3D_PT_sklum_modelling(Panel):
         if props.show_basic_tools:
             # Pivot Tools
             col = box.column(align=True)
-            col.label(text="Pivot & Origin:", icon='PIVOT_CURSOR')
+            col.label(text="Pivot Master:", icon='PIVOT_CURSOR')
             row = col.row(align=True)
             row.operator("modelling.floor_it", text="Floor It", icon='ANCHOR')
             row.operator("modelling.pivot_to_zero", text="Origin to Zero", icon='WORLD')
+            
+            row = col.row(align=True)
+            op = row.operator("modelling.nine_point_pivot", text="Pivot: Bottom", icon='DOT')
+            op.point = 'BOTTOM_CENTER'
+            op = row.operator("modelling.nine_point_pivot", text="Center", icon='DOT')
+            op.point = 'CENTER'
+            op = row.operator("modelling.nine_point_pivot", text="Top", icon='DOT')
+            op.point = 'TOP_CENTER'
             
             box.separator()
             
             # Mesh Quick-Fix
             col = box.column(align=True)
-            col.label(text="Cleanup:", icon='BRUSH_DATA')
+            col.label(text="Mesh Quick-Fix:", icon='BRUSH_DATA')
             row = col.row(align=True)
             row.operator("modelling.delete_interior", text="Delete Interior", icon='MOD_SOLIDIFY')
             row.operator("modelling.quick_cleanup", text="Quick Cleanup", icon='WRENCH')
@@ -45,7 +53,7 @@ class VIEW3D_PT_sklum_modelling(Panel):
             
             # Shading
             col = box.column(align=True)
-            col.label(text="Shading:", icon='SHADING_SOLID')
+            col.label(text="Standard Shading:", icon='SHADING_SOLID')
             col.operator("modelling.auto_smooth", text="Auto Smooth Setup", icon='MOD_SMOOTH')
 
         layout.separator()
@@ -65,8 +73,15 @@ class VIEW3D_PT_sklum_modelling(Panel):
         if props.show_advanced_tools:
             # Technical Dimensions
             col = box.column(align=True)
-            col.label(text="Technical Dimensions:", icon='Object')
+            col.label(text="Technical Dimensions (Ghost Bounds):", icon='Object')
             col.operator("modelling.create_ghost_bounds", text="Create Ghost Bounds", icon='MOD_WIREFRAME')
+            
+            box.separator()
+
+            # Advanced Pivot
+            col = box.column(align=True)
+            col.label(text="Advanced Pivot Suite:", icon='PIVOT_ACTIVE')
+            col.operator("modelling.align_to_active", text="Align Pivot to Active", icon='RELATIVE')
             
             box.separator()
             
