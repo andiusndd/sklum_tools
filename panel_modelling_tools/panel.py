@@ -29,7 +29,7 @@ class VIEW3D_PT_sklum_modelling(Panel):
             col = box.column(align=True)
             col.label(text="Pivot Master:", icon='PIVOT_CURSOR')
             row = col.row(align=True)
-            row.operator("modelling.floor_it", text="Floor It", icon='ANCHOR')
+            row.operator("modelling.floor_it", text="Floor It", icon='ANCHOR_CENTER')
             row.operator("modelling.pivot_to_zero", text="Origin to Zero", icon='WORLD')
             
             row = col.row(align=True)
@@ -47,7 +47,7 @@ class VIEW3D_PT_sklum_modelling(Panel):
             col.label(text="Mesh Quick-Fix:", icon='BRUSH_DATA')
             row = col.row(align=True)
             row.operator("modelling.delete_interior", text="Delete Interior", icon='MOD_SOLIDIFY')
-            row.operator("modelling.quick_cleanup", text="Quick Cleanup", icon='WRENCH')
+            row.operator("modelling.quick_cleanup", text="Quick Cleanup", icon='MODIFIER')
             
             box.separator()
             
@@ -73,7 +73,7 @@ class VIEW3D_PT_sklum_modelling(Panel):
         if props.show_advanced_tools:
             # Technical Dimensions
             col = box.column(align=True)
-            col.label(text="Technical Dimensions (Ghost Bounds):", icon='Object')
+            col.label(text="Technical Dimensions (Ghost Bounds):", icon='OBJECT_DATA')
             col.operator("modelling.create_ghost_bounds", text="Create Ghost Bounds", icon='MOD_WIREFRAME')
             
             box.separator()
@@ -81,7 +81,7 @@ class VIEW3D_PT_sklum_modelling(Panel):
             # Advanced Pivot
             col = box.column(align=True)
             col.label(text="Advanced Pivot Suite:", icon='PIVOT_ACTIVE')
-            col.operator("modelling.align_to_active", text="Align Pivot to Active", icon='RELATIVE')
+            col.operator("modelling.align_to_active", text="Align Pivot to Active", icon='CONSTRAINT')
             
             box.separator()
             
@@ -89,7 +89,7 @@ class VIEW3D_PT_sklum_modelling(Panel):
             col = box.column(align=True)
             col.label(text="Pro Shading & Geometry:", icon='MOD_NORMALEDIT')
             col.operator("modelling.smart_hardener", text="Smart Hardener (W.Normal)", icon='MOD_EDGESPLIT')
-            col.operator("modelling.planar_snap", text="Planar Snap (Flatten)", icon='MOD_CONSTRUCT')
+            col.operator("modelling.planar_snap", text="Planar Snap (Flatten)", icon='MOD_BUILD')
 
 def register():
     bpy.utils.register_class(VIEW3D_PT_sklum_modelling)
