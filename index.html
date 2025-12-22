@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKLUM Tools Dev Dashboard</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f9; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        code { background: #eee; padding: 2px 5px; border-radius: 4px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; padding: 10px; background: #fff; border-left: 4px solid #3498db; }
+        .status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; text-transform: uppercase; }
+        .status-ready { background: #27ae60; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🛠️ SKLUM Tools Dev Dashboard</h1>
+    <p>Development environment for the SKLUM Tools Blender Add-on.</p>
+    
+    <div class="card">
+        <h2>Project Status</h2>
+        <p>Status: <span class="status status-ready">Ready</span></p>
+        <p>Version: 2.5.1</p>
+        <p>Dependencies: <code>Pillow</code> (Installed)</p>
+    </div>
+
+    <div class="card">
+        <h2>Main Modules</h2>
+        <ul>
+            <li><strong>Core:</strong> Constants, utilities, preferences.</li>
+            <li><strong>Checker Tools:</strong> Check All, UVMap, Hard Edges, Color Space.</li>
+            <li><strong>Import/Export:</strong> GLB Material Import, FBX/GLB Export.</li>
+            <li><strong>JPG Converter:</strong> PNG to JPG batch conversion.</li>
+            <li><strong>Auto Rename:</strong> IDP-based batch renaming.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>How to Test</h2>
+        <ol>
+            <li>Open Blender (4.2.0+).</li>
+            <li>Go to <code>Edit → Preferences → Add-ons</code>.</li>
+            <li>Install the addon from this directory or zip it.</li>
+            <li>The addon appears in <code>3D Viewport → Sidebar → SKLUM Tools</code>.</li>
+        </ol>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 SKLUM Tools Development</p>
+    </footer>
+</body>
+</html>
