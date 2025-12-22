@@ -118,3 +118,31 @@ panel_modelling_tools/
 └── op_pivot.py       # Logic xử lý tâm Origin
 Kế hoạch này sẽ giúp team modeling của bạn làm việc cực nhanh: Nhập kích thước -> Vẽ theo khung -> Bo góc nhanh -> Chỉnh tâm chuẩn -> Xuất file.
 
+Kế hoạch: "Substance-Ready Workflow" (v2.5.3)
+1. "Bake-Prep" Exploder (Tránh lỗi chồng lấn khi Bake)
+Trong Substance Painter, các bộ phận quá gần nhau (như chân ghế và mặt ghế) thường bị lỗi "Bleeding" khi Bake Ambient Occlusion.
+
+Chức năng: Tự động di chuyển các bộ phận của model ra xa nhau (Explode) dựa trên khoảng cách định sẵn để Bake, và có một nút "Collapse" để đưa chúng về vị trí cũ sau khi xong.
+2. High/Low Poly Naming Matcher
+Substance Painter Bake bằng "Match by Mesh Name" cực kỳ hiệu quả nếu tên chuẩn.
+
+Chức năng: Tự động thêm đuôi _low cho các vật thể đang chọn.
+Tính năng đi kèm: Nếu bạn nhân bản để làm High-poly, nó sẽ tự đổi _low thành _high chỉ trong 1 click, đảm bảo tên gốc giống hệt nhau (Ví dụ: Leg_01_low -> Leg_01_high).
+3. ID Map Creator (Tạo mặt nạ vật liệu)
+Thay vì tạo nhiều Material slots (làm nặng file), Substance dùng ID Map.
+
+Chức năng: Gán Vertex Color ngẫu nhiên hoặc theo bảng màu cho các bộ phận khác nhau. Khi sang Substance, bạn chỉ cần dùng "Color Selection" để tách vật liệu gỗ, vải, kim loại.
+4. UV Excellence for Substance
+Seams to Hard Edges: Tự động gán Hard Edges (Sắc cạnh) vào tất cả các đường UV Seams. Đây là quy tắc vàng để khi Bake không bị đường đen (seam artifacts).
+Overlapping Checker: Cảnh báo nếu các mảnh UV đang đè lên nhau (trừ trường hợp chủ ý Mirror) để tránh lỗi Texture bị lặp lại sai chỗ.
+UDIM Starter: Hỗ trợ thiết lập nhanh các ô UV (Tiles) nếu model nội thất quá lớn cần độ phân giải cực cao.
+5. Export for Painter (One-Click)
+Triangulate on Export: Tự động tam giác hóa lưới khi xuất FBX (vì Substance cũng sẽ làm vậy, tự làm trước sẽ giúp kiểm soát hướng của các đường chéo tốt hơn).
+Clean Export: Tự động ẩn toàn bộ đèn, camera, và empty khi xuất, chỉ lấy đúng Mesh.
+Danh sách các Task mới:
+Module panel_modelling_tools:
+op_bake_logic.py: Xử lý Exploded view và Naming _low/_high.
+op_uv_painter.py: Đồng bộ Seams/Hard Edges và kiểm tra lỗi UV.
+op_id_mask.py: Công cụ gán Vertex Color làm ID Map.
+Cập nhật panel_checker_tools: Tích hợp các bước kiểm tra cuối cùng trước khi nhấn nút "Send to Painter".
+Kế hoạch này giúp bạn xử lý triệt để khâu "Hậu cần" (Asset prep) vốn chiếm rất nhiều thời gian.
