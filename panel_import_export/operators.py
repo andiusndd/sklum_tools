@@ -156,13 +156,30 @@ class SKLUM_OT_export_glb(Operator):
             return {'CANCELLED'}
 
         folder = os.path.dirname(bpy.data.filepath)
-        filepath = os.path.join(folder, f"{idp}.glb")
+        filename = f"{idp}.glb"
+        filepath = os.path.normpath(bpy.path.abspath(os.path.join(folder, filename)))
 
-        bpy.ops.export_scene.gltf(
-            filepath=filepath,
-            **constants.EXPORT_GLB_SETTINGS,
-        )
-        self.report({'INFO'}, f"Đã xuất file: {filepath}")
+        try:
+            # Native Blender: If use_selection is True but nothing selected, it might export nothing.
+            if not context.selected_objects and constants.EXPORT_GLB_SETTINGS.get('use_selection', True):
+                self.report({'WARNING'}, "Chưa chọn đối tượng nào! File GLB có thể không được tạo hoặc bị trống.")
+
+            bpy.ops.export_scene.gltf(
+                filepath=filepath,
+                **constants.EXPORT_GLB_SETTINGS,
+            )
+            
+            if os.path.exists(filepath):
+                size = os.path.getsize(filepath)
+                if size > 0:
+                    self.report({'INFO'}, f"Đã xuất GLB thành công ({size/1024:.1f} KB): {filepath}")
+                else:
+                    self.report({'WARNING'}, f"File GLB đã được tạo nhưng có kích thước 0 bytes: {filepath}")
+            else:
+                self.report({'ERROR'}, f"Lỗi: Không tìm thấy file GLB sau khi xuất tại {filepath}")
+        except Exception as e:
+            self.report({'ERROR'}, f"Lỗi khi thực thi export_scene.gltf: {str(e)}")
+            
         return {'FINISHED'}
 
 
@@ -197,13 +214,30 @@ class SKLUM_OT_export_fbx(Operator):
             return {'CANCELLED'}
 
         folder = os.path.dirname(bpy.data.filepath)
-        filepath = os.path.join(folder, f"{idp}.fbx")
+        filename = f"{idp}.fbx"
+        filepath = os.path.normpath(bpy.path.abspath(os.path.join(folder, filename)))
 
-        bpy.ops.export_scene.fbx(
-            filepath=filepath,
-            **constants.EXPORT_FBX_SETTINGS,
-        )
-        self.report({'INFO'}, f"Đã xuất file: {filepath}")
+        try:
+            # Native Blender: If use_selection is True but nothing selected, it might export nothing.
+            if not context.selected_objects and constants.EXPORT_FBX_SETTINGS.get('use_selection', True):
+                self.report({'WARNING'}, "Chưa chọn đối tượng nào! File FBX có thể không được tạo hoặc bị trống.")
+
+            bpy.ops.export_scene.fbx(
+                filepath=filepath,
+                **constants.EXPORT_FBX_SETTINGS,
+            )
+            
+            if os.path.exists(filepath):
+                size = os.path.getsize(filepath)
+                if size > 0:
+                    self.report({'INFO'}, f"Đã xuất FBX thành công ({size/1024:.1f} KB): {filepath}")
+                else:
+                    self.report({'WARNING'}, f"File FBX đã được tạo nhưng có kích thước 0 bytes: {filepath}")
+            else:
+                self.report({'ERROR'}, f"Lỗi: Không tìm thấy file FBX sau khi xuất tại {filepath}")
+        except Exception as e:
+            self.report({'ERROR'}, f"Lỗi khi thực thi export_scene.fbx: {str(e)}")
+            
         return {'FINISHED'}
 
 
