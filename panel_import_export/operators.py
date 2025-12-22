@@ -182,16 +182,22 @@ class SKLUM_OT_open_native_glb_export(Operator):
 class SKLUM_OT_export_fbx(Operator):
     bl_idname = "sklum.export_fbx"
     bl_label = "Xuất .FBX"
-    bl_description = "Xuất FBX với tên dựa trên file Blender"
+    bl_description = "Xuất FBX với tên dựa trên IDP"
 
     def execute(self, context):
         if not bpy.data.is_saved:
             self.report({'ERROR'}, "Bạn cần lưu file Blender trước khi xuất FBX!")
             return {'CANCELLED'}
 
+        settings = context.scene.sklum_auto_rename_settings
+        idp = settings.idp.strip()
+
+        if not idp:
+            self.report({'ERROR'}, "Trường IDP không được để trống để đặt tên file FBX!")
+            return {'CANCELLED'}
+
         folder = os.path.dirname(bpy.data.filepath)
-        blend_filename = os.path.splitext(os.path.basename(bpy.data.filepath))[0]
-        filepath = os.path.join(folder, f"{blend_filename}.fbx")
+        filepath = os.path.join(folder, f"{idp}.fbx")
 
         bpy.ops.export_scene.fbx(
             filepath=filepath,

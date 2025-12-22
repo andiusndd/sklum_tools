@@ -20,6 +20,7 @@ class VIEW3D_PT_sklum_import_export(Panel):
 
         row = layout.row(align=True)
         row.operator("sklum.export_glb", text="Export .GLB", icon='EXPORT')
+        row.operator("sklum.export_fbx", text="Export .FBX", icon='EXPORT')
 
         row = layout.row(align=True)
         row.operator("sklum.pack_textures", text="Pack Textures", icon='PACKAGE')

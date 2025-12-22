@@ -4,7 +4,7 @@ Constants - Các hằng số dùng chung trong addon
 
 # Addon info
 ADDON_NAME = "SKLUM Tools"
-ADDON_VERSION = (2, 5, 1)
+ADDON_VERSION = (2, 5, 2)
 ADDON_CATEGORY = "SKLUM Tools"
 
 # Tolerance values
