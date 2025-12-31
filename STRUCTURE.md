@@ -12,14 +12,12 @@ SKLUMToolz/
 ├── panel_import_export/
 ├── panel_jpg_converter/
 ├── panel_auto_rename/
-├── legacy/
 └── presets.json (và các tài nguyên khác)
 ```
 
 - **`__init__.py`**: Điểm vào của add-on. Đăng ký lần lượt `core` và các module panel.
 - **`core/`**: Chứa hằng số, tiện ích dùng chung, preferences và global scene properties.
 - **Các thư mục `panel_*`**: Mỗi thư mục tương ứng một panel trong Sidebar của Blender, gom toàn bộ operator, UI list, panel và logic liên quan.
-- **`legacy/`**: Lưu trữ các file Python cũ (không còn được đăng ký) để tham khảo.
 
 ## Chi tiết thư mục
 
@@ -62,9 +60,6 @@ SKLUMToolz/
 - `panel.py`: Panel UI chính.
 - `__init__.py`: Đăng ký tất cả module con.
 
-### `legacy/`
-- Lưu trữ các file Python trước khi refactor (ví dụ: `tool_auto_rename.py`, `ui_panels.py`). Không được `__init__.py` chính import.
-
 ## Quy ước đăng ký
 
 Mỗi module con cung cấp `register()`/`unregister()` của riêng mình. `__init__.py` chính chỉ cần gọi danh sách modules theo thứ tự, đảm bảo unregister theo thứ tự ngược lại.
@@ -72,4 +67,3 @@ Mỗi module con cung cấp `register()`/`unregister()` của riêng mình. `__i
 ## Tài liệu liên quan
 
 - `README.md`: Hướng dẫn cài đặt, mô tả tính năng add-on.
-- `legacy/README.md`: Mô tả add-on phiên bản cũ (được lưu trữ).

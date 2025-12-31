@@ -20,7 +20,6 @@ Add-on xuất hiện tại `3D Viewport → Sidebar → SKLUM Tools`.
 - **`panel_import_export/`** – Import vật liệu GLB, export FBX/GLB, pack/unpack texture, purge dữ liệu.
 - **`panel_jpg_converter/`** – Chuyển đổi PNG → JPG hàng loạt hoặc riêng lẻ.
 - **`panel_auto_rename/`** – Tự động đổi tên object/material theo dữ liệu CSV và preset.
-- **`legacy/`** – Lưu bản mã nguồn cũ (không còn được đăng ký). Xem `legacy/README.md` để tham khảo.
 
 Chi tiết module xem thêm `STRUCTURE.md`.
 
