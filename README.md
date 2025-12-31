@@ -1,7 +1,7 @@
 # SKLUM Tools – Blender Add-on
 
 **Tác giả:** AndiuS  
-**Phiên bản:** 2.5.2  
+**Phiên bản:** 2.5.4  
 **Blender:** 4.2.0+  
 **Nguồn:** [https://github.com/andius/SKLUM_Tools](https://github.com/andius/SKLUM_Tools)
 
