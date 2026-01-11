@@ -2,6 +2,12 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [2.6.5] - 2026-01-11
+### Fixed
+- **panel_object_setting**: Sửa lỗi UI layout - xóa property `location_axis` bị đặt sai vị trí trong phần Apply Transform.
+- **panel_object_setting**: Hoàn thiện logic đặt origin cho BOTTOM (đáy bounding box) và HEAD (đỉnh bounding box) sử dụng cursor placement chính xác.
+- **panel_object_setting**: Implement đầy đủ chức năng CUSTOM origin với khả năng tùy chỉnh vị trí Z (Bottom/Center/Top) và XY (Center/Origin) theo properties.
+
 ## [2.6.4] - 2026-01-11
 ### Fixed
 - Sửa lỗi `TypeError` nghiêm trọng trên Blender 4.2 do sử dụng tên icon không tồn tại (`ORIENTATION_EXTERNAL`, `PARENT_DEFORMED`).

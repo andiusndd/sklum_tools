@@ -100,7 +100,7 @@ class SKLUM_PT_ObjectSetting(Panel):
 
         # Apply Transform
         row = col.row(align=True)
-        row.prop(settings, "location_axis", text="", icon='CHECKBOX_HLT') # Checkbox placeholder
+        row.label(text="", icon='MODIFIER')
         row.label(text="Apply Transform")
         row.operator("sklum.apply_transform", text="Scale").mode = 'SCALE'
         row.operator("sklum.apply_transform", text="Rotation").mode = 'ROTATION'

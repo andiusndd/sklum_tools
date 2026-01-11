@@ -1,6 +1,7 @@
 """Operators for Object Setting panel"""
 
 import bpy
+import mathutils
 from bpy.types import Operator
 from bpy.props import StringProperty, FloatProperty, EnumProperty
 
@@ -83,17 +84,69 @@ class SKLUM_OT_QuickOrigin(Operator):
 
         for obj in selected:
             context.view_layer.objects.active = obj
+            
             if self.type == 'BOTTOM':
                 # Move origin to bottom center of bounding box
-                bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
-                # This is a bit simplified, a real "Bottom" origin often needs cursor placement
-                # but for now we'll use center bounds as a placeholder or implement specific logic
-                pass 
+                # Save current cursor location
+                saved_cursor = context.scene.cursor.location.copy()
+                
+                # Get bounding box
+                bbox_corners = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
+                min_z = min(corner.z for corner in bbox_corners)
+                center_x = sum(corner.x for corner in bbox_corners) / 8
+                center_y = sum(corner.y for corner in bbox_corners) / 8
+                
+                # Set cursor to bottom center
+                context.scene.cursor.location = (center_x, center_y, min_z)
+                
+                # Set origin to cursor
+                bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+                
+                # Restore cursor
+                context.scene.cursor.location = saved_cursor
+                
             elif self.type == 'CENTER':
                 bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
+                
             elif self.type == 'HEAD':
-                # Placeholder for Top/Head logic
-                bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+                # Move origin to top center of bounding box
+                saved_cursor = context.scene.cursor.location.copy()
+                
+                bbox_corners = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
+                max_z = max(corner.z for corner in bbox_corners)
+                center_x = sum(corner.x for corner in bbox_corners) / 8
+                center_y = sum(corner.y for corner in bbox_corners) / 8
+                
+                context.scene.cursor.location = (center_x, center_y, max_z)
+                bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+                context.scene.cursor.location = saved_cursor
+                
+            elif self.type == 'CUSTOM':
+                # Use custom settings from properties
+                settings = context.scene.sklum_object_settings
+                saved_cursor = context.scene.cursor.location.copy()
+                
+                bbox_corners = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
+                
+                # Calculate Z position based on origin_target_z
+                if settings.origin_target_z == 'BOTTOM':
+                    z_pos = min(corner.z for corner in bbox_corners)
+                elif settings.origin_target_z == 'TOP':
+                    z_pos = max(corner.z for corner in bbox_corners)
+                else:  # CENTER
+                    z_pos = sum(corner.z for corner in bbox_corners) / 8
+                
+                # Calculate XY position based on origin_target_xy
+                if settings.origin_target_xy == 'CENTER':
+                    x_pos = sum(corner.x for corner in bbox_corners) / 8
+                    y_pos = sum(corner.y for corner in bbox_corners) / 8
+                else:  # ORIGIN (0,0)
+                    x_pos = 0
+                    y_pos = 0
+                
+                context.scene.cursor.location = (x_pos, y_pos, z_pos)
+                bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+                context.scene.cursor.location = saved_cursor
                 
         return {'FINISHED'}
 
