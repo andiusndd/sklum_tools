@@ -1,4 +1,8 @@
 
+## [v2.7.5] - 2026-01-12
+### Changed
+- **Version Bump**: Updated addon version to `v2.7.5`.
+
 ## [v2.7.4] - 2026-01-12
 ### Changed
 - **Repository URL**: Updated all references to `https://github.com/andiusndd/sklum_tools.git`.
