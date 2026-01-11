@@ -1,7 +1,8 @@
 """Properties for SKLUM - Import/Export panel"""
 
 import bpy
-from bpy.props import PointerProperty, FloatProperty, PropertyGroup
+from bpy.props import PointerProperty, FloatProperty
+from bpy.types import PropertyGroup
 
 
 class SKLUM_BoxSettings(PropertyGroup):

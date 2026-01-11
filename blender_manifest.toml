@@ -1,6 +1,6 @@
 schema_version = "1.0.0"
 id = "sklum_tools"
-version = "2.6.14"
+version = "2.6.15"
 name = "SKLUM Tools"
 tagline = "Toolkit for mesh, material checking and automation."
 maintainer = "Nguyen Duc Duong"
