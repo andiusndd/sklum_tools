@@ -1,4 +1,8 @@
 
+## [v2.7.6] - 2026-01-12
+### Changed
+- **Export**: Synchronized version for official 2.7.6 release.
+
 ## [v2.7.5] - 2026-01-12
 ### Changed
 - **Version Bump**: Updated addon version to `v2.7.5`.
