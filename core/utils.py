@@ -83,11 +83,15 @@ def check_for_update(repo_url):
     Returns: (is_update_available, latest_version_str, error_msg)
     """
     try:
-        # Convert git URL to raw manifest URL
-        # From: https://github.com/andiusndd/sklum_tools.git
-        # To: https://raw.githubusercontent.com/andiusndd/sklum_tools/master/blender_manifest.toml
-        raw_base = repo_url.replace("github.com", "raw.githubusercontent.com").replace(".git", "")
-        manifest_url = f"{raw_base}/master/blender_manifest.toml"
+        # Clean URL construction
+        if repo_url.endswith(".git"):
+            base_url = repo_url[:-4]
+        else:
+            base_url = repo_url
+            
+        # Use raw.githubusercontent.com for manifest
+        raw_base = base_url.replace("https://github.com/", "https://raw.githubusercontent.com/")
+        manifest_url = f"{raw_base}/main/blender_manifest.toml"
         
         response = requests.get(manifest_url, timeout=10)
         response.raise_for_status()
@@ -115,10 +119,13 @@ def download_and_install_update(repo_url):
     Tải về và cài đặt bản cập nhật từ GitHub.
     """
     try:
-        # Construct ZIP download URL
-        # From: https://github.com/andiusndd/sklum_tools.git
-        # To: https://github.com/andiusndd/sklum_tools/archive/refs/heads/master.zip
-        zip_url = repo_url.replace(".git", "") + "/archive/refs/heads/master.zip"
+        # Clean URL construction
+        if repo_url.endswith(".git"):
+            base_url = repo_url[:-4]
+        else:
+            base_url = repo_url
+            
+        zip_url = f"{base_url}/archive/refs/heads/main.zip"
         
         response = requests.get(zip_url, stream=True, timeout=30)
         response.raise_for_status()
@@ -138,7 +145,7 @@ def download_and_install_update(repo_url):
             temp_extract_dir = tempfile.mkdtemp()
             zip_ref.extractall(temp_extract_dir)
             
-            # The zip usually contains a folder named "repo_name-master"
+            # The zip usually contains a folder named "repo_name-main"
             extracted_folders = os.listdir(temp_extract_dir)
             if not extracted_folders:
                 raise Exception("Zip file is empty")

@@ -5,6 +5,7 @@
 - **Check Update**: New button in "SKLUM Tools Info" to check for latest version.
 - **Auto-Install**: One-click download and installation of the latest version via ZIP from the master branch.
 - **Networking**: Added `requests` dependency logic to handle GitHub API and downloads.
+- **Fixed**: Corrected hostname hostname replacement logic that caused "rawhubusercontent.com" connection errors.
 
 ## [v2.7.2] - 2026-01-12
 ### Added
