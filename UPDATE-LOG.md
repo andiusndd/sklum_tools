@@ -2,6 +2,11 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [2.6.4] - 2026-01-11
+### Fixed
+- Sửa lỗi `TypeError` nghiêm trọng trên Blender 4.2 do sử dụng tên icon không tồn tại (`ORIENTATION_EXTERNAL`, `PARENT_DEFORMED`).
+- Thay thế bằng các icon hợp lệ (`NORMALS_FACE`, `ORIENTATION_PARENT`) giúp panel hiển thị ổn định trên mọi phiên bản Blender 4.x.
+
 ## [2.6.3] - 2026-01-11
 ### Fixed
 - Đại tu toàn bộ logic vẽ UI (draw method) cho module Object Setting.

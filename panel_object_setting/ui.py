@@ -47,7 +47,7 @@ class SKLUM_PT_ObjectSetting(Panel):
         if overlay and shading:
             # Row 1: Normal, Wireframes, Random
             row = col.row(align=True)
-            row.prop(overlay, "show_face_orientation", text="Normal", icon='ORIENTATION_EXTERNAL')
+            row.prop(overlay, "show_face_orientation", text="Normal", icon='NORMALS_FACE')
             row.prop(overlay, "show_wireframes", text="Wireframes", icon='WIRE')
             row.prop_enum(shading, "color_type", value='RANDOM', text="Random")
             
@@ -150,7 +150,7 @@ class SKLUM_PT_ObjectSetting(Panel):
 
         # Parent
         row = col.row(align=True)
-        row.label(text="", icon='PARENT_DEFORMED')
+        row.label(text="", icon='ORIENTATION_PARENT')
         row.label(text="Parent")
         row.operator("sklum.parent_action", text="Set").action = 'SET'
         row.operator("sklum.parent_action", text="Clear").action = 'CLEAR'
