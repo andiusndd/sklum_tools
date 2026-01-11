@@ -7,12 +7,15 @@ Tài liệu này mô tả tổ chức mã nguồn sau khi refactor theo từng p
 ```
 SKLUMToolz/
 ├── __init__.py
+├── README.md
+├── STRUCTURE.md
+├── update-log.md
 ├── core/
 ├── panel_checker_tools/
 ├── panel_import_export/
 ├── panel_jpg_converter/
 ├── panel_auto_rename/
-└── presets.json (và các tài nguyên khác)
+└── presets.json (tự động tạo nếu chưa có)
 ```
 
 - **`__init__.py`**: Điểm vào của add-on. Đăng ký lần lượt `core` và các module panel.
