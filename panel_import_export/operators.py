@@ -392,10 +392,16 @@ class SKLUM_OT_create_box(Operator):
         settings = context.scene.sklum_box_settings
         x, y, z = settings.box_x, settings.box_y, settings.box_z
         
-        # Create Cube
-        # Create at arbitrary location first to avoid conflict, then move
+        # 1. Delete existing box if present
+        BOX_NAME = "SKLUM_Reference_Box"
+        if BOX_NAME in bpy.data.objects:
+            old_obj = bpy.data.objects[BOX_NAME]
+            bpy.data.objects.remove(old_obj, do_unlink=True)
+            
+        # 2. Create Cube
         bpy.ops.mesh.primitive_cube_add(size=1, align='WORLD', location=(0, 0, 0))
         obj = context.active_object
+        obj.name = BOX_NAME
         
         # Set Dimensions
         obj.dimensions = (x, y, z)
@@ -410,12 +416,7 @@ class SKLUM_OT_create_box(Operator):
         # 2. Use Cursor to set origin to bottom center
         saved_location = context.scene.cursor.location.copy()
         
-        # Since box is centered at (0,0,0) locally relative to its geometry, 
-        # and we just set origin to median, the bottom face center is at -z/2 locally.
-        # But wait, we need to be careful with world coordinates vs local.
-        # The safest way is to use bounding box.
-        
-        # Get bounds in world space (since we just applied scale)
+        # Get bounds in world space
         import mathutils
         bbox_corners = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
         
@@ -435,7 +436,16 @@ class SKLUM_OT_create_box(Operator):
         # Restore Cursor
         context.scene.cursor.location = saved_location
         
-        self.report({'INFO'}, f"Đã tạo Box {x:.1f}x{y:.1f}x{z:.1f} tại gốc tọa độ.")
+        # 3. New Features
+        # Set Display Type to WIRE
+        obj.display_type = 'WIRE'
+        
+        # Lock Transforms
+        obj.lock_location = (True, True, True)
+        obj.lock_rotation = (True, True, True)
+        obj.lock_scale = (True, True, True)
+        
+        self.report({'INFO'}, f"Đã tạo Box tham chiếu: {x:.1f}x{y:.1f}x{z:.1f} (Wireframe, Locked)")
         return {'FINISHED'}
 
 

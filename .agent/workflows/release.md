@@ -1,140 +1,112 @@
 ---
-description: Automated release pipeline (Version -> Log -> Audit -> Export)
+description: Automated release pipeline (Version -> Log -> Clean -> Test -> Export)
 ---
 
 # /release Command Workflow
 
-Workflow này tự động hóa toàn bộ quy trình phát hành phiên bản mới.
+Workflow này tự động hóa toàn bộ quy trình phát hành phiên bản mới, kết nối các workflow con (`/clean`, `/test`, `/export`) thành một chuỗi hoàn chỉnh.
+
+## Tự động hỏi từng bước
+
+Nếu user gửi `/release` thiếu tham số, hãy hỏi:
+
+1. **VERSION_TYPE**: `major` | `minor` | `patch` (hoặc số cụ thể).
+2. **CHANGELOG**: Nội dung thay đổi ngắn gọn để ghi vào log.
 
 ## Quy trình xử lý
 
-1.  **Thu thập thông tin**:
-    Agent hỏi người dùng:
-    - `VERSION_TYPE`: `major` | `minor` | `patch` (hoặc số version cụ thể e.g. `2.7.0`)
-    - `CHANGELOG`: Nội dung thay đổi ngắn gọn.
+// turbo-all
 
-2.  **Tạo Script Helper**: Tạo `_release_helper.py` để cập nhật version và log.
+1.  **Dọn dẹp môi trường (Cleanup)**:
+    - Thực thi workflow `clean.md` để xóa rác và cache cũ.
+    - `python _clean_project.py`
 
-    ```python
-    import os
-    import re
-    import sys
-    from datetime import datetime
+2.  **Cập nhật Phiên bản & Log**:
+    - Tạo và chạy script `_release_helper.py` (như mẫu bên dưới) để:
+        - Tăng version trong `blender_manifest.toml` và `__init__.py`.
+        - Chèn nội dung changelog vào đầu file `UPDATE-LOG.md`.
+    - Sau đó xóa script helper.
 
-    MANIFEST_FILE = "blender_manifest.toml"
-    INIT_FILE = "__init__.py"
+3.  **Kiểm tra chất lượng (Audit/Test)**:
+    - Thực thi workflow `test.md`.
+    - Chạy `python _test_addon.py`.
+    - **CRITICAL**: Nếu bước này báo lỗi (Exit code 1), **DỪNG QUY TRÌNH NGAY**. Yêu cầu user sửa lỗi (gợi ý dùng `/fix`).
 
-    def update_manifest_version(version_input):
-        if not os.path.exists(MANIFEST_FILE):
-            print(f"❌ {MANIFEST_FILE} not found!")
-            sys.exit(1)
+4.  **Đóng gói (Export)**:
+    - Nếu Audit OK, thực thi workflow `export.md`.
+    - Chạy `python _export_addon.py`.
 
-        with open(MANIFEST_FILE, 'r', encoding='utf-8') as f:
-            content = f.read()
+5.  **Báo cáo**:
+    - Thông báo version mới.
+    - Đường dẫn file ZIP đã tạo.
 
-        # Regex for TOML version: version = "1.0.0"
-        match = re.search(r'version\s*=\s*[\"|\'](\d+)\.(\d+)\.(\d+)[\"|\']', content)
-        if not match:
-             print("❌ Cannot find version in manifest")
-             sys.exit(1)
+### Mẫu Script Helper (_release_helper.py)
 
-        major, minor, patch = map(int, match.groups())
+```python
+import os
+import re
+import sys
+from datetime import datetime
 
-        if version_input == 'major': major += 1; minor = 0; patch = 0
-        elif version_input == 'minor': minor += 1; patch = 0
-        elif version_input == 'patch': patch += 1
-        else: # Specific
-            try:
-                parts = version_input.split('.')
-                major, minor, patch = int(parts[0]), int(parts[1]), int(parts[2])
-            except:
-                print("❌ Invalid version format")
-                sys.exit(1)
+MANIFEST_FILE = "blender_manifest.toml"
+INIT_FILE = "__init__.py"
 
-        new_version_str = f"{major}.{minor}.{patch}"
-        
-        # 1. Update Manifest
-        new_content = re.sub(r'version\s*=\s*[\"|\']\d+\.\d+\.\d+[\"|\']', f'version = "{new_version_str}"', content)
-        with open(MANIFEST_FILE, 'w', encoding='utf-8') as f:
-            f.write(new_content)
-            
-        print(f"   Updated {MANIFEST_FILE} -> {new_version_str}")
-        return major, minor, patch
+def update_manifest_version(version_input):
+    if not os.path.exists(MANIFEST_FILE): sys.exit(1)
 
-    def sync_init_file(major, minor, patch):
-        # Keeps legacy __init__.py in sync for backward compatibility
-        if not os.path.exists(INIT_FILE): return
-        
-        with open(INIT_FILE, 'r', encoding='utf-8') as f:
-            content = f.read()
-            
-        new_tuple = f'"version": ({major}, {minor}, {patch})'
-        new_content = re.sub(r'"version":\s*\(\d+,\s*\d+,\s*\d+\)', new_tuple, content)
-        
-        with open(INIT_FILE, 'w', encoding='utf-8') as f:
-            f.write(new_content)
-        print(f"   Synced {INIT_FILE}")
+    with open(MANIFEST_FILE, 'r', encoding='utf-8') as f: content = f.read()
 
-    def update_log(version_str, changelog):
-        log_path = "UPDATE-LOG.md"
-        today = datetime.now().strftime("%Y-%m-%d")
-        header = f"## [{version_str}] - {today}\n"
-        entry = f"{header}{changelog}\n\n"
-        
+    match = re.search(r'version\s*=\s*[\"|\'](\d+)\.(\d+)\.(\d+)[\"|\']', content)
+    if not match: sys.exit(1)
+
+    major, minor, patch = map(int, match.groups())
+
+    if version_input == 'major': major += 1; minor = 0; patch = 0
+    elif version_input == 'minor': minor += 1; patch = 0
+    elif version_input == 'patch': patch += 1
+    else: 
         try:
-             with open(log_path, 'r', encoding='utf-8') as f:
-                old_content = f.read()
-             
-             lines = old_content.splitlines(keepends=True)
-             insert_idx = 4
-             if len(lines) > 4: lines.insert(insert_idx, entry)
-             else: lines.append(entry)
-            
-             with open(log_path, 'w', encoding='utf-8') as f:
-                 f.writelines(lines)
-        except Exception as e:
-            print(f"⚠️ Could not update log: {e}")
+            parts = version_input.split('.')
+            major, minor, patch = int(parts[0]), int(parts[1]), int(parts[2])
+        except: sys.exit(1)
 
-    if __name__ == "__main__":
-        if len(sys.argv) < 3:
-            print("Usage: python _release_helper.py <type> <notes>")
-            sys.exit(1)
+    new_version_str = f"{major}.{minor}.{patch}"
+    
+    new_content = re.sub(r'version\s*=\s*[\"|\']\d+\.\d+\.\d+[\"|\']', f'version = "{new_version_str}"', content)
+    with open(MANIFEST_FILE, 'w', encoding='utf-8') as f: f.write(new_content)
         
-        v_type = sys.argv[1]
-        notes = sys.argv[2]
-        
-        major, minor, patch = update_manifest_version(v_type)
-        sync_init_file(major, minor, patch)
-        update_log(f"{major}.{minor}.{patch}", notes)
-        
-        print(f"✅ Released v{major}.{minor}.{patch}")
-    ```
+    return major, minor, patch
 
-3.  **Thực thi Release Pipeline**:
+def sync_init_file(major, minor, patch):
+    if not os.path.exists(INIT_FILE): return
+    with open(INIT_FILE, 'r', encoding='utf-8') as f: content = f.read()
+    new_tuple = f'"version": ({major}, {minor}, {patch})'
+    new_content = re.sub(r'"version":\s*\(\d+,\s*\d+,\s*\d+\)', new_tuple, content)
+    with open(INIT_FILE, 'w', encoding='utf-8') as f: f.write(new_content)
 
-    -   **Bước 1: Cleanup (`/clean`)**
-        Agent chạy quy trình dọn dẹp để đảm bảo package sạch sẽ.
-        `> Running /clean...`
+def update_log(version_str, changelog):
+    log_path = "UPDATE-LOG.md"
+    today = datetime.now().strftime("%Y-%m-%d")
+    header = f"## [{version_str}] - {today}\n"
+    entry = f"{header}### Released\n- {changelog}\n\n"
+    
+    try:
+         with open(log_path, 'r', encoding='utf-8') as f: lines = f.readlines()
+         # Insert after header or at suitable position (e.g., line 4)
+         insert_idx = 0
+         for i, line in enumerate(lines):
+             if line.strip() == "": insert_idx = i + 1; break
+         if insert_idx == 0 and len(lines) > 2: insert_idx = 4
+         
+         lines.insert(insert_idx, entry)
+         with open(log_path, 'w', encoding='utf-8') as f: f.writelines(lines)
+    except: pass
 
-    -   **Bước 2: Update Version & Log**
-        Chạy script helper: `python _release_helper.py <VERSION_TYPE> <CHANGELOG>`
-        Xóa script helper sau khi xong.
-
-    -   **Bước 3: Audit (`/test`)**
-        Agent chạy quy trình Audit.
-        `> Running /test...`
-        **CRITICAL**: Nếu Audit thất bại, DỪNG LẠI NGAY LẬP TỨC.
-
-    -   **Bước 4: Export (`/export`)**
-        Nếu Audit thành công, chạy quy trình Export.
-        `> Running /export...`
-        
-    -   **Hoàn tất**: Thông báo file ZIP cuối cùng.
-
-## Ví dụ
+if __name__ == "__main__":
+    v_type = sys.argv[1]
+    notes = sys.argv[2]
+    maj, min, pat = update_manifest_version(v_type)
+    sync_init_file(maj, min, pat)
+    update_log(f"{maj}.{min}.{pat}", notes)
+    print(f"✅ Released v{maj}.{min}.{pat}")
 ```
-/release
-> Input: patch
-> Input: "Fix bug UI crash"
-```
--> Tự động tăng patch -> update log -> audit -> export zip.

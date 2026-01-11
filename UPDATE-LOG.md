@@ -4,6 +4,10 @@ Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ 
 
 ## [v2.6.15] - 2026-01-11
 ### Fixed
+- **Import/Export Panel**: Cải tiến tính năng **Tạo Box**.
+  - Chỉ tạo duy nhất 1 box (tự xóa box cũ).
+  - Hiển thị dạng Wireframe.
+  - Khóa di chuyển/xoay/scale để làm tham chiếu cố định.
 - **Import/Export Panel**: Sửa lỗi `ImportError` do import sai `PropertyGroup` từ `bpy.props` thay vì `bpy.types`.
 
 ## [v2.6.14] - 2026-01-11
