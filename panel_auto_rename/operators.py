@@ -194,43 +194,34 @@ class SKLUM_OT_AutoRenameExecute(Operator):
             if node.type != 'TEX_IMAGE' or not node.image:
                 continue
 
-            # Trace to find the Principled BSDF socket this texture connects to
-            bsdf_socket_name = self._trace_to_principled_bsdf(node)
-            
             tex_suffix = None
             color_space = None
 
-            # Check for Normal Map first (special case)
-            is_normal = False
-            for output in node.outputs:
-                if output.is_linked:
-                    for link in output.links:
-                        if link.to_node.type == 'NORMAL_MAP':
-                            tex_suffix, color_space, _ = constants.NORMAL_MAP_CONFIG
-                            is_normal = True
-                            break
-                    if is_normal:
-                        break
-
-            # Use traced BSDF socket if available
-            if not is_normal and bsdf_socket_name:
+            # 1. Trace Connection (Universal Priority)
+            # This handles ALL connections including Normal, Transmission, etc.
+            bsdf_socket_name = self._trace_to_principled_bsdf(node)
+            
+            if bsdf_socket_name:
                 if bsdf_socket_name in constants.TEXTURE_TYPE_MAPPING:
                     tex_suffix, color_space, _ = constants.TEXTURE_TYPE_MAPPING[bsdf_socket_name]
                 else:
-                    # Fallback: use socket name directly as suffix
+                    # Fallback: use socket name directly as suffix if not in mapping
                     tex_suffix = f"_{bsdf_socket_name.replace(' ', '')}"
                     color_space = constants.COLOR_SPACE_NON_COLOR
 
-            # Fallback to keyword-based detection
+            # 2. Fallback to keyword-based detection (Last Priority)
             if not tex_suffix:
                 search_terms = node.name.lower() + (node.label.lower() if node.label else "")
-                if any(keyword in search_terms for keyword in constants.NORMAL_MAP_CONFIG[2]):
-                    tex_suffix, color_space, _ = constants.NORMAL_MAP_CONFIG
-                else:
-                    for config in constants.TEXTURE_TYPE_MAPPING.values():
-                        if any(keyword in search_terms for keyword in config[2]):
-                            tex_suffix, color_space, _ = config
-                            break
+                # Check mapping keywords first
+                for config in constants.TEXTURE_TYPE_MAPPING.values():
+                    if any(keyword in search_terms for keyword in config[2]):
+                        tex_suffix, color_space, _ = config
+                        break
+                
+                # Check special normal config if still not found
+                if not tex_suffix:
+                    if any(keyword in search_terms for keyword in constants.NORMAL_MAP_CONFIG[2]):
+                        tex_suffix, color_space, _ = constants.NORMAL_MAP_CONFIG
 
             if tex_suffix and color_space:
                 new_name = f"{base_name}{tex_suffix}{suffix}" if base_name else f"Texture{tex_suffix}{suffix}"
@@ -261,7 +252,6 @@ class SKLUM_OT_AutoRenameExecute(Operator):
     def _trace_to_principled_bsdf(self, start_node, visited=None, depth=0):
         """
         Trace từ một node texture để tìm socket của Principled BSDF mà nó kết nối đến.
-        Đệ quy qua các node trung gian (Mix, Math, Separate, etc.)
         Returns: Tên socket trên Principled BSDF (e.g., "Transmission Weight") hoặc None
         """
         if visited is None:
@@ -284,7 +274,7 @@ class SKLUM_OT_AutoRenameExecute(Operator):
                 if to_node.type == 'BSDF_PRINCIPLED':
                     return to_socket.name
 
-                # Continue tracing through intermediate nodes
+                # Continue tracing through intermediate nodes (including Normal Map node, Mix, etc.)
                 result = self._trace_to_principled_bsdf(to_node, visited, depth + 1)
                 if result:
                     return result

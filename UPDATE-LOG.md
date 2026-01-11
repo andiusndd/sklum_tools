@@ -2,6 +2,16 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [2.5.7] - 2026-01-11
+### Refactored
+- Chuẩn hóa hoàn toàn logic đổi tên texture: Tất cả các loại texture (bao gồm cả Normal Map) giờ đây đều được xử lý đồng nhất dựa trên vị trí kết nối (Socket).
+- Loại bỏ các trường hợp kiểm tra đặc biệt cho loại Node, đảm bảo tính nhất quán tuyệt đối theo vị trí cắm dây.
+
+## [2.5.6] - 2026-01-11
+### Fixed
+- Ưu tiên tuyệt đối logic Trace (vị trí cắm) để đổi tên texture. Khắc phục lỗi khi Normal node cắm vào các socket không phải Normal (ví dụ: Transmission Weight).
+- Node label giờ luôn phản ánh chính xác socket đích (e.g., "TRANSMISSION", "METALLIC").
+
 ## [2.5.5] - 2026-01-11
 ### Added
 - Hàm `_trace_to_principled_bsdf()` để trace kết nối texture qua các node trung gian.

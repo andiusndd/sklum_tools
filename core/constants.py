@@ -33,6 +33,7 @@ TEXTURE_TYPE_MAPPING = {
     "Roughness": ("_Roughness", COLOR_SPACE_NON_COLOR, ["roughness", "rough"]),
     "Alpha": ("_Alpha", COLOR_SPACE_SRGB, ["alpha", "opacity"]),
     "IOR": ("_IOR", COLOR_SPACE_NON_COLOR, ["ior"]),
+    "Normal": ("_Normal", COLOR_SPACE_NON_COLOR, ["normal"]),
     
     # ===== Subsurface =====
     "Subsurface Weight": ("_Subsurface", COLOR_SPACE_NON_COLOR, ["subsurface", "sss"]),

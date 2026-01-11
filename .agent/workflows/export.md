@@ -38,9 +38,9 @@ Khi nhận được `/export` hoặc `@[/export]`, Agent sẽ thực hiện quy 
 
 5.  **Nén thành file ZIP**:
     - Tên file ZIP CÓ VERSION: `SKLUMToolz_v{major}.{minor}.{patch}.zip`
-    - Bên trong ZIP chứa thư mục `SKLUMTool/` (KHÔNG có version)
+    - Bên trong ZIP chứa thư mục `SKLUMToolz/` (KHÔNG có version)
 
-6.  **Dọn dẹp**: Xóa thư mục tạm `../SKLUMTool/` sau khi nén xong.
+6.  **Dọn dẹp**: Xóa thư mục tạm `../SKLUMToolz/` sau khi nén xong.
 
 7.  **Báo cáo kết quả**: Thông báo đường dẫn file ZIP.
 
