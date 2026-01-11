@@ -15,6 +15,7 @@ SKLUMToolz/
 ├── panel_import_export/
 ├── panel_jpg_converter/
 ├── panel_auto_rename/
+├── panel_object_setting/
 └── presets.json (tự động tạo nếu chưa có)
 ```
 
@@ -62,6 +63,12 @@ SKLUMToolz/
 - `handlers.py`: Handler load file để nạp cache CSV.
 - `panel.py`: Panel UI chính.
 - `__init__.py`: Đăng ký tất cả module con.
+
+### `panel_object_setting/` [NEW]
+- `properties.py`: Lưu trữ trạng thái UI (rename string, origin settings, location).
+- `operators.py`: Các thao tác với Object (Selection, Transform, Origin, Shading, Material, Parent).
+- `ui.py`: Thiết kế giao diện bảng điều khiển tích hợp.
+- `__init__.py`: Đăng ký properties, operators và UI.
 
 ## Quy ước đăng ký
 

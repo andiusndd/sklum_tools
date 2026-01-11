@@ -198,16 +198,34 @@ class SKLUM_OT_AutoRenameExecute(Operator):
             color_space = None
             node_label_name = None
 
-            # 1. Trace Connection (Universal Priority)
-            bsdf_socket_name = self._trace_to_principled_bsdf(node)
+            # 1. Trace Connections (Universal Priority - Supports Multiple Sockets)
+            # Returns a set of socket names, e.g. {"Metallic", "Roughness"}
+            bsdf_sockets = self._trace_to_principled_bsdf(node)
             
-            if bsdf_socket_name:
-                node_label_name = bsdf_socket_name
-                if bsdf_socket_name in constants.TEXTURE_TYPE_MAPPING:
-                    tex_suffix, color_space, _ = constants.TEXTURE_TYPE_MAPPING[bsdf_socket_name]
+            if bsdf_sockets:
+                # Node Label: Join all socket names with spaces and uppercase
+                # e.g. "METALLIC ROUGHNESS"
+                # Use sorted list for consistent label order
+                sorted_sockets = sorted(list(bsdf_sockets))
+                node_label_name = " ".join(sorted_sockets)
+                
+                # File Suffix: Find common suffix for these sockets
+                # Priority: If any socket is in mapping, use its suffix. 
+                # If multiple different suffixes, pick the first one from sorted list.
+                found_suffixes = []
+                for s_name in sorted_sockets:
+                    if s_name in constants.TEXTURE_TYPE_MAPPING:
+                        res = constants.TEXTURE_TYPE_MAPPING[s_name]
+                        found_suffixes.append((res[0], res[1])) # (suffix, colorspace)
+                
+                if found_suffixes:
+                    # Pick unique suffixes. Usually they share one (like _RMA) 
+                    # If they differ, we pick the first one encountered in sorted socket list.
+                    tex_suffix, color_space = found_suffixes[0]
                 else:
-                    # Fallback: use socket name directly as suffix if not in mapping
-                    tex_suffix = f"_{bsdf_socket_name.replace(' ', '')}"
+                    # Fallback: use first socket name directly if not in mapping
+                    first_socket = sorted_sockets[0]
+                    tex_suffix = f"_{first_socket.replace(' ', '')}"
                     color_space = constants.COLOR_SPACE_NON_COLOR
 
             # 2. Fallback to keyword-based detection (Last Priority)
@@ -229,9 +247,9 @@ class SKLUM_OT_AutoRenameExecute(Operator):
             if tex_suffix and color_space:
                 new_name = f"{base_name}{tex_suffix}{suffix}" if base_name else f"Texture{tex_suffix}{suffix}"
                 
-                # Rename node label (e.g., "METALLIC" even if file is "_RMA")
+                # Rename node label (e.g., "METALLIC ROUGHNESS")
                 if node_label_name:
-                    final_label = node_label_name.replace(" ", "_").upper()
+                    final_label = node_label_name.upper() # User requested spaces, no underscores
                     if node.label != final_label:
                         node.label = final_label
                 
@@ -255,14 +273,16 @@ class SKLUM_OT_AutoRenameExecute(Operator):
 
     def _trace_to_principled_bsdf(self, start_node, visited=None, depth=0):
         """
-        Trace từ một node texture để tìm socket của Principled BSDF mà nó kết nối đến.
-        Returns: Tên socket trên Principled BSDF (e.g., "Transmission Weight") hoặc None
+        Trace từ một node texture để tìm TẤT CẢ các socket của Principled BSDF mà nó kết nối đến.
+        Returns: set() chứa các tên socket (e.g., {"Metallic", "Roughness"})
         """
         if visited is None:
             visited = set()
 
+        sockets_found = set()
+
         if depth > 10 or start_node in visited:
-            return None
+            return sockets_found
 
         visited.add(start_node)
 
@@ -274,16 +294,14 @@ class SKLUM_OT_AutoRenameExecute(Operator):
                 to_node = link.to_node
                 to_socket = link.to_socket
 
-                # Found Principled BSDF
+                # Found Principled BSDF connection
                 if to_node.type == 'BSDF_PRINCIPLED':
-                    return to_socket.name
+                    sockets_found.add(to_socket.name)
+                else:
+                    # Continue tracing through intermediate nodes
+                    sockets_found.update(self._trace_to_principled_bsdf(to_node, visited, depth + 1))
 
-                # Continue tracing through intermediate nodes (including Normal Map node, Mix, etc.)
-                result = self._trace_to_principled_bsdf(to_node, visited, depth + 1)
-                if result:
-                    return result
-
-        return None
+        return sockets_found
 
 
 classes = (

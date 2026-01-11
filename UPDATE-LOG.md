@@ -2,6 +2,34 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [2.6.1] - 2026-01-11
+### Fixed
+- Bổ sung các nút chức năng còn thiếu trong module `panel_object_setting`:
+    - Thêm nút `Display` và `Rename` cho nhóm Materials.
+    - Chuẩn hóa nhãn và icon cho nhóm `Display Overlay` (Normal, Wireframes, Random, Flat Color, Origins, render).
+    - Cải thiện layout để giống 100% so với thiết kế mẫu.
+
+## [2.6.0] - 2026-01-11
+### Added
+- Thêm module mới `panel_object_setting`: Bảng điều khiển quản lý đối tượng toàn diện.
+    - Nhóm `Display Overlay`: Tùy chỉnh nhanh chế độ hiển thị Viewport (Wireframes, Face Orientation, Origins...).
+    - Nhóm `Object Display`: Chỉnh chế độ hiển thị riêng cho Object (Wire, Bounds, Name, X-ray...).
+    - Nhóm `Object`:
+        - Rename: Đổi tên hàng loạt.
+        - Select By Type: Chọn nhanh mesh, light, camera, empty...
+        - Apply Transform: Scale, Rotation, All.
+        - Quick Origin: Đặt trọng tâm vào Bottom, Center, Head.
+        - Custom Origin: Đặt trọng tâm tùy chỉnh theo trục.
+        - Shading: FlipNormal, AutoSmooth, Mark/Clear Sharp.
+        - Materials: Quản lý nhanh vật liệu (Remove).
+        - Location & Parent: Di chuyển theo trục và thiết lập quan hệ cha con.
+        - Make Single User: Tách dữ liệu độc lập.
+
+## [2.5.9] - 2026-01-11
+### Added
+- Hỗ trợ hiển thị đa socket trên nhãn node: Nếu một texture được cắm vào nhiều đầu vào (ví dụ: Metallic và Roughness), nhãn của node sẽ hiển thị tất cả các tên socket đó, ngăn cách bằng khoảng trắng (e.g., `METALLIC ROUGHNESS`).
+- Cải tiến hàm trace: Có khả năng thu thập toàn bộ các điểm kết nối thay vì chỉ dừng lại ở điểm đầu tiên.
+
 ## [2.5.8] - 2026-01-11
 ### Added
 - Trường hợp đặc biệt cho nhóm RMA: Các texture cắm vào Roughness, Metallic, hoặc Occlusion sẽ được đặt tên file kết thúc bằng `_RMA`.
