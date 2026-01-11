@@ -13,8 +13,8 @@ Khi nhận được `/export` hoặc `@[/export]`, Agent sẽ thực hiện quy 
 1.  **Đọc phiên bản hiện tại**: Lấy version từ `bl_info["version"]` trong `__init__.py`.
 
 2.  **Tạo thư mục export**:
-    - Đường dẫn: `../SKLUMToolz_v{major}.{minor}.{patch}/`
-    - Ví dụ: `SKLUMToolz_v2.5.5/`
+    - Tạo thư mục tạm: `../SKLUMToolz/` (KHÔNG có version trong tên thư mục!)
+    - **QUAN TRỌNG**: Blender sử dụng tên thư mục làm tên module Python. Nếu thư mục có tên khác `SKLUMToolz`, addon sẽ báo lỗi "No module named".
 
 3.  **Copy các file/thư mục cần thiết**:
     - `__init__.py`
@@ -37,10 +37,12 @@ Khi nhận được `/export` hoặc `@[/export]`, Agent sẽ thực hiện quy 
     - `presets.json` (user data)
 
 5.  **Nén thành file ZIP**:
-    - Tạo file `SKLUMToolz_v{major}.{minor}.{patch}.zip`
-    - Sử dụng PowerShell: `Compress-Archive -Path "SKLUMToolz_v*" -DestinationPath "SKLUMToolz_v*.zip"`
+    - Tên file ZIP CÓ VERSION: `SKLUMToolz_v{major}.{minor}.{patch}.zip`
+    - Bên trong ZIP chứa thư mục `SKLUMTool/` (KHÔNG có version)
 
-6.  **Báo cáo kết quả**: Thông báo đường dẫn thư mục và file zip đã tạo.
+6.  **Dọn dẹp**: Xóa thư mục tạm `../SKLUMTool/` sau khi nén xong.
+
+7.  **Báo cáo kết quả**: Thông báo đường dẫn file ZIP.
 
 ## Ví dụ sử dụng
 
@@ -49,5 +51,5 @@ Khi nhận được `/export` hoặc `@[/export]`, Agent sẽ thực hiện quy 
 ```
 
 Kết quả: 
-- Thư mục: `../SKLUMToolz_v2.5.5/`
-- File ZIP: `../SKLUMToolz_v2.5.5.zip` (sẵn sàng upload)
+- File ZIP: `../SKLUMToolz_v2.5.5.zip`
+- Bên trong ZIP: thư mục `SKLUMToolz/` (sẵn sàng cài đặt)

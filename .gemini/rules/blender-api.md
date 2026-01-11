@@ -14,3 +14,8 @@
 - **Naming**:
     - Properties must be prefixed with `sklum_` to prevent namespace collisions with other addons.
     - Follow PEP 8 for Python code style.
+- **Addon Packaging (QUAN TRỌNG)**:
+    - Khi export addon, thư mục chứa addon **PHẢI** có tên trùng với tên module trong code (ví dụ: `SKLUMToolz`).
+    - **KHÔNG BAO GIỜ** đặt tên thư mục có version (e.g., `SKLUMToolz_v2.5.5`) vì Blender sử dụng tên thư mục làm tên module Python.
+    - Version chỉ được đặt trong tên file ZIP (e.g., `SKLUMToolz_v2.5.5.zip`), KHÔNG trong tên thư mục bên trong.
+
