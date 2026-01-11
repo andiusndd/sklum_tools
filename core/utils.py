@@ -166,8 +166,11 @@ def download_and_install_update(repo_url):
                 else:
                     shutil.copy2(s, d)
             
-            # Cleanup temp files
+            # Cleanup temp extract dir (source files)
             shutil.rmtree(temp_extract_dir)
+            
+        # Cleanup the downloaded ZIP file after closing zipfile handle
+        if os.path.exists(tmp_path):
             os.remove(tmp_path)
             
         return True, "Update installed successfully. Please restart Blender."
