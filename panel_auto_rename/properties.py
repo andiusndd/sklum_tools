@@ -36,13 +36,13 @@ def get_furniture_items(self, context):
 
 
 def get_material_items(self, context):
-    """Returns 35 material items for material_name dropdown."""
+    """Returns 34 material items for material_name dropdown (from material.csv)."""
     material_list = [
-        "Acrylic", "Aluminum", "Bamboo", "Brass", "Ceramic", "Concrete", "Copper",
-        "Cotton", "Faux leather", "Foam", "Granite", "Hardwood", "Iron", "Leather",
-        "Linen", "Marble", "MDF", "Plastic", "Plywood", "Polyester", "Quartz",
-        "Rattan", "Resin", "Rubber", "Silk", "Softwood", "Solidwood", "Stainless steel",
-        "Steel", "Tempered glass", "Velvet", "Veneer", "Wool", "Wrought iron"
+        "Solidwood", "Hardwood", "Softwood", "Plywood", "MDF", "Veneer", "Bamboo",
+        "Rattan", "Steel", "Stainless steel", "Aluminum", "Iron", "Wrought iron",
+        "Brass", "Copper", "Tempered glass", "Marble", "Granite", "Quartz", "Ceramic",
+        "Concrete", "Leather", "Faux leather", "Velvet", "Linen", "Cotton", "Polyester",
+        "Silk", "Wool", "Plastic", "Acrylic", "Resin", "Rubber", "Foam"
     ]
     
     # Return as enum items: (identifier, name, description)

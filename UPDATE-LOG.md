@@ -15,8 +15,8 @@ Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ 
 
 ## [v2.6.8] - 2026-01-12
 ### Added
-- **Auto Rename Panel**: Thêm 35 material presets cho trường "Tên VL".
-  - Dropdown hiển thị danh sách vật liệu từ Acrylic đến Wrought iron, sắp xếp theo thứ tự A-Z.
+- **Auto Rename Panel**: Thêm 34 material presets cho trường "Tên VL".
+  - Dropdown hiển thị danh sách vật liệu từ Solidwood đến Foam, theo thứ tự từ material.csv.
   - Tích hợp tính năng search/filter: Người dùng có thể gõ để lọc nhanh các material phù hợp.
   - Chuyển đổi từ StringProperty sang EnumProperty để tối ưu UX.
 
