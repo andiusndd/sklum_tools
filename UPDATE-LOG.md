@@ -5,6 +5,15 @@ Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ 
 
 
 
+
+## [v2.7.0] - 2026-01-12
+### Changed
+- **Auto Rename Panel**: Hardcode dữ liệu từ CSV vào source code.
+  - Model parts data (100 furniture types) giờ được lưu trực tiếp trong `utils.py` dưới dạng dictionary `MODEL_PARTS_DATA`.
+  - Loại bỏ dependency vào file `model_parts.csv` - dữ liệu tự động load khi addon khởi động.
+  - Dễ dàng sửa đổi và maintain trực tiếp trong source code.
+  - Không cần external CSV files, giảm complexity khi deploy addon.
+
 ## [v2.6.9] - 2026-01-12
 ### Added
 - **Auto Rename Panel**: Thêm dynamic part presets cho trường "Tên" (mesh_name).

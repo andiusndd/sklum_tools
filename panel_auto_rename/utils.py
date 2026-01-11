@@ -92,45 +92,110 @@ def set_last_loaded_csv(filepath):
     _last_loaded_csv_filepath = filepath
 
 
-# --- Model Parts Cache Helpers ---
+# --- Model Parts Data (Hardcoded from model_parts.csv) ---
 
-_model_parts_cache = {}
-
-
-def get_model_parts_csv_path():
-    """Get path to model_parts.csv file."""
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), "model_parts.csv")
-
-
-def load_model_parts_csv():
-    """Load model parts mapping from CSV file."""
-    global _model_parts_cache
-    
-    csv_path = get_model_parts_csv_path()
-    if not os.path.exists(csv_path):
-        print(f"Warning: model_parts.csv not found at {csv_path}")
-        return False
-    
-    try:
-        _model_parts_cache.clear()
-        with open(csv_path, 'r', encoding='utf-8') as handle:
-            reader = csv.reader(handle)
-            next(reader)  # Skip header row
-            
-            for row in reader:
-                if len(row) >= 3:
-                    model_name = row[1].strip()  # Column: Đồ vật (Item)
-                    parts_str = row[2].strip()   # Column: Bộ phận chính (Parts)
-                    # Split parts by comma and clean whitespace
-                    parts = [part.strip() for part in parts_str.split(',')]
-                    _model_parts_cache[model_name] = parts
-        
-        print(f"Loaded {len(_model_parts_cache)} model parts from CSV")
-        return True
-    except Exception as exc:
-        print(f"Error loading model_parts.csv: {exc}")
-        _model_parts_cache.clear()
-        return False
+MODEL_PARTS_DATA = {
+    "Armchair": ["Armrest", "Backrest"],
+    "Basin": ["Drain", "Rim"],
+    "Bed": ["Frame", "Headboard"],
+    "Bench": ["Seat", "Leg"],
+    "Bin": ["Lid", "Liner"],
+    "Blanket": ["Fabric", "Edge"],
+    "Blender": ["Blade", "Jar"],
+    "Blinds": ["Slat", "Cord"],
+    "Bookshelf": ["Shelf", "Upright"],
+    "Bowl": ["Rim", "Base"],
+    "Broom": ["Bristles", "Handle"],
+    "Brush": ["Handle", "Bristles"],
+    "Bucket": ["Handle", "Body"],
+    "Bulb": ["Filament", "Glass"],
+    "Cabinet": ["Door", "Hinge"],
+    "Candle": ["Wick", "Wax"],
+    "Canister": ["Lid", "Seal"],
+    "Carpet": ["Pile", "Backing"],
+    "Chair": ["Seat", "Leg"],
+    "Chandelier": ["Chain", "Bulb"],
+    "Closet": ["Rod", "Shelf"],
+    "Clock": ["Hands", "Dial"],
+    "Comb": ["Teeth", "Spine"],
+    "Comforter": ["Filling", "Shell"],
+    "Cot": ["Rail", "Mattress"],
+    "Couch": ["Cushion", "Arm"],
+    "Cradle": ["Rocker", "Frame"],
+    "Cup": ["Handle", "Rim"],
+    "Cupboard": ["Shelf", "Door"],
+    "Curtains": ["Fabric", "Ring"],
+    "Cushion": ["Cover", "Filling"],
+    "Desk": ["Desktop", "Drawer"],
+    "Dish": ["Rim", "Surface"],
+    "Drapes": ["Lining", "Hem"],
+    "Dresser": ["Drawer", "Mirror"],
+    "Dryer": ["Drum", "Filter"],
+    "Duvet": ["Cover", "Filling"],
+    "Fan": ["Blade", "Grill"],
+    "Faucet": ["Spout", "Handle"],
+    "Fork": ["Tine", "Handle"],
+    "Frame": ["Border", "Glass"],
+    "Freezer": ["Shelf", "Door"],
+    "Fridge": ["Shelf", "Compressor"],
+    "Futon": ["Frame", "Mattress"],
+    "Glass": ["Rim", "Base"],
+    "Hammock": ["Net", "Rope"],
+    "Heater": ["Coil", "Grill"],
+    "Iron": ["Soleplate", "Handle"],
+    "Jar": ["Lid", "Mouth"],
+    "Jug": ["Spout", "Handle"],
+    "Kettle": ["Spout", "Handle"],
+    "Knife": ["Blade", "Handle"],
+    "Ladle": ["Bowl", "Handle"],
+    "Lamp": ["Shade", "Base"],
+    "Lantern": ["Handle", "Glass"],
+    "Mat": ["Surface", "Backing"],
+    "Mattress": ["Spring", "Foam"],
+    "Microwave": ["Door", "Turntable"],
+    "Mirror": ["Glass", "Frame"],
+    "Mixer": ["Beater", "Motor"],
+    "Mop": ["Head", "Handle"],
+    "Mug": ["Handle", "Body"],
+    "Nightstand": ["Drawer", "Top"],
+    "Ottoman": ["Cushion", "Leg"],
+    "Oven": ["Rack", "Door"],
+    "Painting": ["Canvas", "Frame"],
+    "Pan": ["Surface", "Handle"],
+    "Photo": ["Image", "Paper"],
+    "Pillow": ["Case", "Filling"],
+    "Pitcher": ["Spout", "Handle"],
+    "Plant": ["Stem", "Leaf"],
+    "Plate": ["Rim", "Base"],
+    "Poster": ["Paper", "Ink"],
+    "Pot": ["Lid", "Handle"],
+    "Quilt": ["Stitch", "Filling"],
+    "Recliner": ["Footrest", "Lever"],
+    "Rug": ["Fringe", "Pile"],
+    "Shelf": ["Board", "Bracket"],
+    "Sheet": ["Fabric", "Hem"],
+    "Shower": ["Head", "Hose"],
+    "Sideboard": ["Top", "Door"],
+    "Sink": ["Basin", "Drain"],
+    "Soap": ["Bar", "Scent"],
+    "Sofa": ["Cushion", "Back"],
+    "Sponge": ["Pore", "Surface"],
+    "Spoon": ["Bowl", "Handle"],
+    "Statue": ["Base", "Figure"],
+    "Stool": ["Seat", "Leg"],
+    "Stove": ["Burner", "Knob"],
+    "Table": ["Top", "Leg"],
+    "Tap": ["Valve", "Handle"],
+    "Toaster": ["Slot", "Lever"],
+    "Toilet": ["Seat", "Tank"],
+    "Towel": ["Fabric", "Loop"],
+    "Tray": ["Surface", "Rim"],
+    "Tub": ["Drain", "Rim"],
+    "Vase": ["Neck", "Base"],
+    "Wardrobe": ["Rail", "Door"],
+    "Washer": ["Drum", "Door"],
+    "Wok": ["Surface", "Handle"],
+}
 
 
 def get_parts_for_model(model_type):
@@ -142,12 +207,7 @@ def get_parts_for_model(model_type):
     Returns:
         List of part names, or ['Part'] if not found
     """
-    # Load CSV if cache is empty
-    if not _model_parts_cache:
-        load_model_parts_csv()
-    
-    # Return parts for this model, or default if not found
-    return _model_parts_cache.get(model_type, ['Part'])
+    return MODEL_PARTS_DATA.get(model_type, ['Part'])
 
 
 # --- Preset Helpers ---
