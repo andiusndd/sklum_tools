@@ -1,4 +1,8 @@
 
+## [v2.7.7] - 2026-01-12
+### Changed
+- **Export**: Official v2.7.7 release.
+
 ## [v2.7.6] - 2026-01-12
 ### Changed
 - **Export**: Synchronized version for official 2.7.6 release.
