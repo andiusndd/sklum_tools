@@ -13,50 +13,69 @@ class SKLUM_PT_ObjectSetting(Panel):
 
     def draw(self, context):
         layout = self.layout
-        settings = context.scene.sklum_object_settings
+        scene = context.scene
         
+        # 0. Property Initialization Check
+        settings = getattr(scene, "sklum_object_settings", None)
+        if not settings:
+            layout.label(text="Settings not initialized. Try re-installing.", icon='ERROR')
+            return
+
+        # 1. Overlay & Shading (Viewport Access)
+        self._draw_overlay_section(layout, context)
+        
+        # 2. Object Display
+        self._draw_object_display_section(layout, context)
+        
+        # 3. Object Management
+        self._draw_object_management_section(layout, context, settings)
+
+    def _draw_overlay_section(self, layout, context):
         # Safe access to space_data properties
         space_data = context.space_data
-        is_3d_view = space_data and space_data.type == 'VIEW_3D'
-        
-        overlay = space_data.overlay if is_3d_view and hasattr(space_data, 'overlay') else None
-        shading = space_data.shading if is_3d_view and hasattr(space_data, 'shading') else None
+        if not space_data or space_data.type != 'VIEW_3D':
+            return
 
-        # --- Display Overlay ---
+        overlay = getattr(space_data, "overlay", None)
+        shading = getattr(space_data, "shading", None)
+
         box = layout.box()
         col = box.column(align=True)
         row = col.row()
         row.label(text="Display Overlay", icon='RESTRICT_VIEW_OFF')
         
         if overlay and shading:
+            # Row 1: Normal, Wireframes, Random
             row = col.row(align=True)
             row.prop(overlay, "show_face_orientation", text="Normal", icon='ORIENTATION_EXTERNAL')
             row.prop(overlay, "show_wireframes", text="Wireframes", icon='WIRE')
-            row.prop(shading, "color_type", text="Random")
+            row.prop_enum(shading, "color_type", value='RANDOM', text="Random")
             
+            # Row 2: Flat Color, Origins, render
             row = col.row(align=True)
-            row.prop(shading, "light", text="Flat Color", icon='COLOR')
+            row.prop_enum(shading, "light", value='FLAT', text="Flat Color", icon='COLOR')
             row.prop(overlay, "show_object_origins", text="Origins", icon='ORIENTATION_CURSOR')
             row.prop(overlay, "show_overlays", text="render", icon='RENDERLAYERS')
         else:
-            col.label(text="Display settings unavailable", icon='ERROR')
-        
-        # --- Object Display ---
+            col.label(text="Viewport settings inaccessible", icon='ERROR')
+
+    def _draw_object_display_section(self, layout, context):
         box = layout.box()
         col = box.column(align=True)
         col.label(text="Object Display", icon='OBJECT_DATA')
         
         row = col.row(align=True)
-        # These are usually per-object, but we can show them for active
-        if context.active_object:
-            obj = context.active_object
+        obj = context.active_object
+        if obj:
             row.prop_enum(obj, "display_type", 'TEXTURED', text="Default", icon='SHADING_TEXTURE')
             row.prop_enum(obj, "display_type", 'WIRE', text="Wire", icon='SHADING_WIRE')
             row.prop_enum(obj, "display_type", 'BOUNDS', text="Bounds", icon='SHADING_BBOX')
             row.prop(obj, "show_in_front", text="Xray", icon='XRAY')
             row.prop(obj, "show_name", text="Name", icon='SORTALPHA')
+        else:
+            row.label(text="No active object", icon='INFO')
 
-        # --- Object Management ---
+    def _draw_object_management_section(self, layout, context, settings):
         box = layout.box()
         col = box.column(align=True)
         col.label(text="Object", icon='MESH_DATA')
@@ -81,7 +100,7 @@ class SKLUM_PT_ObjectSetting(Panel):
 
         # Apply Transform
         row = col.row(align=True)
-        row.prop(settings, "location_axis", text="", icon='CHECKBOX_HLT') # Placeholder check
+        row.prop(settings, "location_axis", text="", icon='CHECKBOX_HLT') # Checkbox placeholder
         row.label(text="Apply Transform")
         row.operator("sklum.apply_transform", text="Scale").mode = 'SCALE'
         row.operator("sklum.apply_transform", text="Rotation").mode = 'ROTATION'
@@ -139,6 +158,7 @@ class SKLUM_PT_ObjectSetting(Panel):
         # Final Big Button
         layout.separator()
         layout.operator("object.make_single_user", text="Make Single User", icon='QUESTION').type = 'ALL'
+
 
 classes = (
     SKLUM_PT_ObjectSetting,

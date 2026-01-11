@@ -1,6 +1,6 @@
 bl_info = {
     "name": "SKLUM Tools",
-    "version": (2, 6, 2),
+    "version": (2, 6, 3),
     "blender": (4, 2, 0),
     "location": "3D Viewport > Sidebar > SKLUM Tools",
     "description": "Toolkit for mesh, material checking and automation.",

@@ -2,6 +2,12 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [2.6.3] - 2026-01-11
+### Fixed
+- Đại tu toàn bộ logic vẽ UI (draw method) cho module Object Setting.
+- Sử dụng `prop_enum` cho các nút bấm trạng thái chuyên biệt (Random, Flat Color) để đảm bảo hiển thị đúng kiểu nút bấm thay vì dropdown.
+- Thêm cơ chế kiểm tra lỗi phân mảnh (modular safety checks) để dù một phần Viewport gặp lỗi, các nhóm chức năng khác (Rename, Origin, Transform...) vẫn hiển thị đầy đủ 100%.
+
 ## [2.6.2] - 2026-01-11
 ### Fixed
 - Đồng bộ tên panel thành `SKLUM - Object Setting` cho nhất quán với hệ thống.
