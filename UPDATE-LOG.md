@@ -2,6 +2,13 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [2.6.6] - 2026-01-11
+### UI Overhaul
+- **panel_object_setting**: Thiết kế lại toàn bộ giao diện theo chuẩn "Pixel-Perfect Split Layout".
+- Căn chỉnh thẳng hàng labels và controls (tỉ lệ 40/60).
+- Tối ưu hóa không gian cho các nhóm nút Shading, Materials, Custom Origin.
+- Sử dụng icon chính xác cho từng mục (Rename, Transform, Type...).
+
 ## [2.6.5] - 2026-01-11
 ### Fixed
 - **panel_object_setting**: Sửa lỗi UI layout - xóa property `location_axis` bị đặt sai vị trí trong phần Apply Transform.

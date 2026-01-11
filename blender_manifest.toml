@@ -1,0 +1,17 @@
+schema_version = "1.0.0"
+id = "sklum_tools"
+version = "2.6.6"
+name = "SKLUM Tools"
+tagline = "Toolkit for mesh, material checking and automation."
+maintainer = "Nguyen Duc Duong"
+type = "add-on"
+website = "https://github.com/your-repo/SKLUMToolz"
+tags = ["3D View", "Mesh", "Productivity"]
+blender_version_min = "4.2.0"
+license = ["GPL-2.0-or-later"]
+copyright = ["2026 Nguyen Duc Duong"]
+
+[permissions]
+network = "Check for updates and download assets"
+files = "Export and import project files"
+clipboard = "Copy object names and data"

@@ -13,3 +13,7 @@
     - Khi gặp lỗi trong quá trình thực thi (runtime error, logic error hoặc bị user nhắc nhở), Agent phải phân tích nguyên nhân gốc rễ.
     - Tự động cập nhật hoặc tạo mới các file quy tắc trong `.gemini/rules/` để ngăn chặn lỗi tương tự lặp lại trong tương lai.
     - Ghi nhận lỗi và giải pháp vào bộ quy tắc tương ứng (ví dụ: lỗi Blender API thì cập nhật `blender-api.md`).
+- **Blender 4.2+ Addon Development**:
+    - Sử dụng `blender_manifest.toml` để quản lý metadata thay cho `bl_info` truyền thống.
+    - Tuân thủ cấu trúc thư mục và quy chuẩn đóng gói của hệ thống Blender Extensions mới.
+    - Cập nhật các thành phần API thay đổi trong phiên bản 4.2+ (ví dụ: EEVEE Next, các thay đổi trong Shader Nodes và GPU module).
