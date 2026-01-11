@@ -29,7 +29,8 @@ class VIEW3D_PT_sklum_auto_rename(Panel):
         row = box.row()
         row.prop(settings, "idp")
 
-        box.prop(settings, "model_type")
+        # Model Type with Add button
+        utils.draw_preset_input(box, settings, "model_type", "sklum.add_furniture_preset", "sklum.remove_furniture_preset")
 
         row = box.row()
         row.prop(settings, "main_material", text="Collection")
@@ -57,8 +58,20 @@ class VIEW3D_PT_sklum_auto_rename(Panel):
             item = settings.items[settings.active_index]
 
             item_box = box.box()
-            item_box.prop(item, "mesh_name")
-            item_box.prop(item, "material_name")
+            
+            # Mesh Name with Add button (needs custom context)
+            row = item_box.row(align=True)
+            row.prop(item, "mesh_name")
+            op = row.operator("sklum.add_part_preset", text="", icon="ADD")
+            op.value_to_add = item.mesh_name
+            op.model_type = settings.model_type
+            
+            op_rem = row.operator("sklum.remove_part_preset", text="", icon="REMOVE")
+            op_rem.value_to_add = item.mesh_name
+            op_rem.model_type = settings.model_type
+            
+            # Material Name with Add button
+            utils.draw_preset_input(item_box, item, "material_name", "sklum.add_material_preset", "sklum.remove_material_preset")
 
         layout.operator("sklum.auto_rename_execute", text="Đổi", icon='PLAY')
 

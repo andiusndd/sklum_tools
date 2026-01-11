@@ -1,6 +1,6 @@
 bl_info = {
     "name": "SKLUM Tools",
-    "version": (2, 7, 0),
+    "version": (2, 7, 2),
     "blender": (4, 2, 0),
     "location": "3D Viewport > Sidebar > SKLUM Tools",
     "description": "Toolkit for mesh, material checking and automation.",
@@ -14,6 +14,7 @@ from . import panel_import_export
 from . import panel_jpg_converter
 from . import panel_auto_rename
 from . import panel_object_setting
+from . import panel_version_info
 
 
 modules = [
@@ -23,6 +24,7 @@ modules = [
     panel_jpg_converter,
     panel_auto_rename,
     panel_object_setting,
+    panel_version_info,
 ]
 
 

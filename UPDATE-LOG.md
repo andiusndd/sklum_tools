@@ -6,6 +6,19 @@ Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ 
 
 
 
+## [v2.7.2] - 2026-01-12
+### Added
+- **Version Info Panel**: Added a dedicated, fixed panel at the top of the sidebar.
+- **Display**: Shows "SKLUM Tools v2.7.2" with icon to easily identify the installed version.
+- **Layout**: Uses `bl_order=0` to ensure priority placement.
+- **Fixed**: Corrected version display issue (was showing `v?.?.?`) and changed icon to Heart.
+
+## [v2.7.1] - 2026-01-12
+### Added
+- **Preset Management**: Added "Remove" (-) button next to Model Type, Name, and Material inputs.
+- **Persistence**: Removing a preset instantly updates the corresponding CSV file (`model.csv`, `material.csv`, `model_parts.csv`).
+- **UI**: Improved layout for inputs to include both Add (+) and Remove (-) actions cleanly using `align=True`.
+
 ## [v2.7.0] - 2026-01-12
 ### Changed
 - **Auto Rename Panel**: Hardcode dữ liệu từ CSV vào source code.
@@ -13,6 +26,7 @@ Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ 
   - Loại bỏ dependency vào file `model_parts.csv` - dữ liệu tự động load khi addon khởi động.
   - Dễ dàng sửa đổi và maintain trực tiếp trong source code.
   - Không cần external CSV files, giảm complexity khi deploy addon.
+  - **Fixed:** Resolved `AttributeError` when running Rename operator (replaced old `add_preset` calls).
 
 ## [v2.6.9] - 2026-01-12
 ### Added

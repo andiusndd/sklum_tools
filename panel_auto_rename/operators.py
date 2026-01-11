@@ -38,17 +38,83 @@ class SKLUM_OT_SetPresetValue(Operator):
         return {'FINISHED'}
 
 
-class SKLUM_OT_AddPreset(Operator):
-    bl_idname = "sklum.add_preset"
-    bl_label = "Add Preset"
-    bl_description = "Thêm giá trị hiện tại vào danh sách preset"
+class SKLUM_OT_AddFurniturePreset(Operator):
+    bl_idname = "sklum.add_furniture_preset"
+    bl_label = "Add Furniture Preset"
+    bl_description = "Add current furniture type to presets"
 
-    preset_type: StringProperty()
     value_to_add: StringProperty()
 
     def execute(self, context):
-        utils.add_preset(self.preset_type, self.value_to_add)
-        self.report({'INFO'}, f"Đã thêm preset '{self.value_to_add}' vào '{self.preset_type}'.")
+        utils.add_furniture_preset(self.value_to_add)
+        self.report({'INFO'}, f"Added '{self.value_to_add}' to furniture presets.")
+        return {'FINISHED'}
+
+
+class SKLUM_OT_AddMaterialPreset(Operator):
+    bl_idname = "sklum.add_material_preset"
+    bl_label = "Add Material Preset"
+    bl_description = "Add current material to presets"
+
+    value_to_add: StringProperty()
+
+    def execute(self, context):
+        utils.add_material_preset(self.value_to_add)
+        self.report({'INFO'}, f"Added '{self.value_to_add}' to material presets.")
+        return {'FINISHED'}
+
+
+class SKLUM_OT_AddPartPreset(Operator):
+    bl_idname = "sklum.add_part_preset"
+    bl_label = "Add Part Preset"
+    bl_description = "Add current part name to presets for this model type"
+
+    value_to_add: StringProperty()
+    model_type: StringProperty()
+
+    def execute(self, context):
+        utils.add_part_preset(self.model_type, self.value_to_add)
+        self.report({'INFO'}, f"Added '{self.value_to_add}' to parts for {self.model_type}.")
+        return {'FINISHED'}
+
+
+class SKLUM_OT_RemoveFurniturePreset(Operator):
+    bl_idname = "sklum.remove_furniture_preset"
+    bl_label = "Remove Furniture Preset"
+    bl_description = "Remove current furniture type from presets"
+
+    value_to_add: StringProperty() # Using same prop name for simplicity in UI calling
+
+    def execute(self, context):
+        utils.remove_furniture_preset(self.value_to_add)
+        self.report({'INFO'}, f"Removed '{self.value_to_add}' from furniture presets.")
+        return {'FINISHED'}
+
+
+class SKLUM_OT_RemoveMaterialPreset(Operator):
+    bl_idname = "sklum.remove_material_preset"
+    bl_label = "Remove Material Preset"
+    bl_description = "Remove current material from presets"
+
+    value_to_add: StringProperty()
+
+    def execute(self, context):
+        utils.remove_material_preset(self.value_to_add)
+        self.report({'INFO'}, f"Removed '{self.value_to_add}' from material presets.")
+        return {'FINISHED'}
+
+
+class SKLUM_OT_RemovePartPreset(Operator):
+    bl_idname = "sklum.remove_part_preset"
+    bl_label = "Remove Part Preset"
+    bl_description = "Remove current part name from presets for this model type"
+
+    value_to_add: StringProperty()
+    model_type: StringProperty()
+
+    def execute(self, context):
+        utils.remove_part_preset(self.model_type, self.value_to_add)
+        self.report({'INFO'}, f"Removed '{self.value_to_add}' from parts for {self.model_type}.")
         return {'FINISHED'}
 
 
@@ -143,10 +209,10 @@ class SKLUM_OT_AutoRenameExecute(Operator):
             self.report({'WARNING'}, "Danh sách đổi tên đang trống.")
             return {'CANCELLED'}
 
-        utils.add_preset("model_types", settings.model_type)
+        utils.add_furniture_preset(settings.model_type)
         for item in settings.items:
-            utils.add_preset("mesh_names", item.mesh_name)
-            utils.add_preset("material_names", item.material_name)
+            utils.add_part_preset(settings.model_type, item.mesh_name)
+            utils.add_material_preset(item.material_name)
 
         parent_empty = next((obj for obj in context.scene.objects if obj.type == 'EMPTY' and obj.parent is None), None)
         if not parent_empty:
@@ -306,7 +372,12 @@ class SKLUM_OT_AutoRenameExecute(Operator):
 
 classes = (
     SKLUM_OT_SetPresetValue,
-    SKLUM_OT_AddPreset,
+    SKLUM_OT_AddFurniturePreset,
+    SKLUM_OT_AddMaterialPreset,
+    SKLUM_OT_AddPartPreset,
+    SKLUM_OT_RemoveFurniturePreset,
+    SKLUM_OT_RemoveMaterialPreset,
+    SKLUM_OT_RemovePartPreset,
     SKLUM_OT_AutoRenameAddItem,
     SKLUM_OT_AutoRenameRemoveItem,
     SKLUM_OT_AutoRenameClearList,

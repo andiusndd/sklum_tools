@@ -13,74 +13,41 @@ from bpy.props import (
 from . import utils
 
 
-def get_furniture_items(self, context):
-    """Returns 100 furniture items sorted A-Z for model_type dropdown."""
-    furniture_list = [
-        "Armchair", "Basin", "Bed", "Bench", "Bin", "Blanket", "Blender", "Blinds",
-        "Bookshelf", "Bowl", "Broom", "Brush", "Bucket", "Bulb", "Cabinet", "Candle",
-        "Canister", "Carpet", "Chair", "Chandelier", "Closet", "Clock", "Comb", "Comforter",
-        "Cot", "Couch", "Cradle", "Cup", "Cupboard", "Curtains", "Cushion", "Desk",
-        "Dish", "Drapes", "Dresser", "Dryer", "Duvet", "Fan", "Faucet", "Fork",
-        "Frame", "Freezer", "Fridge", "Futon", "Glass", "Hammock", "Heater", "Iron",
-        "Jar", "Jug", "Kettle", "Knife", "Ladle", "Lamp", "Lantern", "Mat",
-        "Mattress", "Microwave", "Mirror", "Mixer", "Mop", "Mug", "Nightstand", "Ottoman",
-        "Oven", "Painting", "Pan", "Photo", "Pillow", "Pitcher", "Plant", "Plate",
-        "Poster", "Pot", "Quilt", "Recliner", "Rug", "Shelf", "Sheet", "Shower",
-        "Sideboard", "Sink", "Soap", "Sofa", "Sponge", "Spoon", "Statue", "Stool",
-        "Stove", "Table", "Tap", "Toaster", "Toilet", "Towel", "Tray", "Tub",
-        "Vase", "Wardrobe", "Washer", "Wok"
-    ]
-    
-    # Return as enum items: (identifier, name, description)
-    return [(item, item, f"Furniture type: {item}") for item in furniture_list]
+def search_furniture_items(self, context, edit_text):
+    """Search callback for model_type StringProperty."""
+    return [item for item in utils.FURNITURE_DATA if edit_text.lower() in item.lower()]
 
 
-def get_material_items(self, context):
-    """Returns 34 material items for material_name dropdown (from material.csv)."""
-    material_list = [
-        "Solidwood", "Hardwood", "Softwood", "Plywood", "MDF", "Veneer", "Bamboo",
-        "Rattan", "Steel", "Stainless steel", "Aluminum", "Iron", "Wrought iron",
-        "Brass", "Copper", "Tempered glass", "Marble", "Granite", "Quartz", "Ceramic",
-        "Concrete", "Leather", "Faux leather", "Velvet", "Linen", "Cotton", "Polyester",
-        "Silk", "Wool", "Plastic", "Acrylic", "Resin", "Rubber", "Foam"
-    ]
-    
-    # Return as enum items: (identifier, name, description)
-    return [(item, item, f"Material: {item}") for item in material_list]
+def search_material_items(self, context, edit_text):
+    """Search callback for material_name StringProperty."""
+    return [item for item in utils.MATERIAL_DATA if edit_text.lower() in item.lower()]
 
 
-def get_mesh_name_items(self, context):
-    """Returns mesh name items filtered by selected model_type.
-    
-    This callback dynamically filters parts based on the furniture type
-    selected in model_type field.
-    """
+def search_mesh_name_items(self, context, edit_text):
+    """Search callback for mesh_name StringProperty (dynamic filtering)."""
     # Get the current model_type from parent settings
     settings = context.scene.sklum_auto_rename_settings
     model_type = settings.model_type
     
     if model_type:
-        # Get parts for this specific model type
         parts = utils.get_parts_for_model(model_type)
     else:
-        # No model type selected, show default
         parts = ['Part']
     
-    # Return as enum items: (identifier, name, description)
-    return [(part, part, f"Part: {part}") for part in parts]
+    return [part for part in parts if edit_text.lower() in part.lower()]
 
 
 class SKLUM_PG_AutoRenameItem(PropertyGroup):
     original_name: StringProperty()
-    mesh_name: EnumProperty(
+    mesh_name: StringProperty(
         name="Tên",
-        items=get_mesh_name_items,
-        description="Select part name (filtered by model type)"
+        search=search_mesh_name_items,
+        description="Select part name (filtered by model type) or type manually"
     )
-    material_name: EnumProperty(
+    material_name: StringProperty(
         name="Tên VL",
-        items=get_material_items,
-        description="Select material type from preset list"
+        search=search_material_items,
+        description="Select material type or type manually"
     )
 
 
@@ -90,10 +57,10 @@ class SKLUM_PG_AutoRenameSettings(PropertyGroup):
         update=lambda self, context: self.update_idp_and_collection_from_model_id(context),
     )
     idp: StringProperty(name="IDP")
-    model_type: EnumProperty(
+    model_type: StringProperty(
         name="Loại Model",
-        items=get_furniture_items,
-        description="Select furniture type from preset list"
+        search=search_furniture_items,
+        description="Select furniture type or type manually"
     )
     main_material: StringProperty(name="Collection")
 

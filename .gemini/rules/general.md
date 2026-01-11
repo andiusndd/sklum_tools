@@ -18,3 +18,7 @@
     - Tuân thủ cấu trúc thư mục và quy chuẩn đóng gói của hệ thống Blender Extensions mới.
     - Cập nhật các thành phần API thay đổi trong phiên bản 4.2+ (ví dụ: EEVEE Next, các thay đổi trong Shader Nodes và GPU module).
     - **Verification**: LUÔN kiểm tra sự tồn tại của file (ví dụ: `Test-Path` hoặc `os.path.exists`) trước khi thông báo cho user rằng file đã được tạo. Không bao giờ giả định thành công chỉ dựa trên output của script.
+- **Workflow Default (TUYỆT ĐỐI - KHÔNG NGOẠI LỆ)**:
+    - **QUY TẮC BẤT DI BẤT DỊCH**: Nếu prompt của USER **không bắt đầu** bằng ký tự `/` hoặc các lệnh workflow đã định nghĩa (ví dụ: `@[/update]`, `@[/fix]`), Agent **BẮT BUỘC** phải tự động coi đó là workflow `/ask`.
+    - **CHẾ ĐỘ READ-ONLY TUYỆT ĐỐI**: Chỉ được phép đọc, phân tích và trả lời câu hỏi. **TUYỆT ĐỐI KHÔNG** được sử dụng bất kỳ tool chỉnh sửa file nào (`write_to_file`, `replace_file_content`, v.v.).
+    - Mọi hành động sửa đổi code đều **PHẢI** được kích hoạt bởi một Command rõ ràng (bắt đầu bằng `/`).

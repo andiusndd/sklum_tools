@@ -210,46 +210,132 @@ def get_parts_for_model(model_type):
     return MODEL_PARTS_DATA.get(model_type, ['Part'])
 
 
+# --- Furniture & Material Data (Hardcoded defaults) ---
+
+FURNITURE_DATA = [
+    "Armchair", "Basin", "Bed", "Bench", "Bin", "Blanket", "Blender", "Blinds",
+    "Bookshelf", "Bowl", "Broom", "Brush", "Bucket", "Bulb", "Cabinet", "Candle",
+    "Canister", "Carpet", "Chair", "Chandelier", "Closet", "Clock", "Comb", "Comforter",
+    "Cot", "Couch", "Cradle", "Cup", "Cupboard", "Curtains", "Cushion", "Desk",
+    "Dish", "Drapes", "Dresser", "Dryer", "Duvet", "Fan", "Faucet", "Fork",
+    "Frame", "Freezer", "Fridge", "Futon", "Glass", "Hammock", "Heater", "Iron",
+    "Jar", "Jug", "Kettle", "Knife", "Ladle", "Lamp", "Lantern", "Mat",
+    "Mattress", "Microwave", "Mirror", "Mixer", "Mop", "Mug", "Nightstand", "Ottoman",
+    "Oven", "Painting", "Pan", "Photo", "Pillow", "Pitcher", "Plant", "Plate",
+    "Poster", "Pot", "Quilt", "Recliner", "Rug", "Shelf", "Sheet", "Shower",
+    "Sideboard", "Sink", "Soap", "Sofa", "Sponge", "Spoon", "Statue", "Stool",
+    "Stove", "Table", "Tap", "Toaster", "Toilet", "Towel", "Tray", "Tub",
+    "Vase", "Wardrobe", "Washer", "Wok"
+]
+
+MATERIAL_DATA = [
+    "Solidwood", "Hardwood", "Softwood", "Plywood", "MDF", "Veneer", "Bamboo",
+    "Rattan", "Steel", "Stainless steel", "Aluminum", "Iron", "Wrought iron",
+    "Brass", "Copper", "Tempered glass", "Marble", "Granite", "Quartz", "Ceramic",
+    "Concrete", "Leather", "Faux leather", "Velvet", "Linen", "Cotton", "Polyester",
+    "Silk", "Wool", "Plastic", "Acrylic", "Resin", "Rubber", "Foam"
+]
+
+
 # --- Preset Helpers ---
 
-def get_preset_path():
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), "presets.json")
+def get_csv_path(filename):
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), filename)
+
+def save_list_to_csv(data_list, filename, header="Item"):
+    filepath = get_csv_path(filename)
+    try:
+        with open(filepath, 'w', encoding='utf-8', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(["STT", header])
+            for idx, item in enumerate(data_list, 1):
+                writer.writerow([idx, item])
+        print(f"Saved {len(data_list)} items to {filename}")
+    except Exception as e:
+        print(f"Error saving {filename}: {e}")
+
+def add_furniture_preset(value):
+    if value and value not in FURNITURE_DATA:
+        FURNITURE_DATA.append(value)
+        FURNITURE_DATA.sort()
+        # Save to furniture.csv if it exists or create it? User asked to save if possible.
+        save_list_to_csv(FURNITURE_DATA, "model.csv", "Vật dụng (Item)")
+
+def add_material_preset(value):
+    if value and value not in MATERIAL_DATA:
+        MATERIAL_DATA.append(value)
+        # Check if we should sort materials? Original CSV was not sorted alphabetically but grouped.
+        # But for new items, appending is safer than re-sorting everything if order matters.
+        # However, search sorts by relevance.
+        save_list_to_csv(MATERIAL_DATA, "material.csv", "Vật liệu (Material)")
+
+def add_part_preset(model_type, value):
+    if not model_type or not value: return
+    
+    parts = MODEL_PARTS_DATA.get(model_type, [])
+    if value not in parts:
+        parts.append(value)
+        MODEL_PARTS_DATA[model_type] = parts
+        
+        # Saving model_parts is stricter because it's a dict.
+        # We need to reconstruct the CSV from MODEL_PARTS_DATA
+        filepath = get_csv_path("model_parts.csv")
+        try:
+            with open(filepath, 'w', encoding='utf-8', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(["STT", "Đồ vật (Item)", "Bộ phận chính (Parts)"])
+                for idx, (m_type, m_parts) in enumerate(MODEL_PARTS_DATA.items(), 1):
+                    writer.writerow([idx, m_type, ", ".join(m_parts)])
+            print(f"Updated model_parts.csv with new part '{value}' for '{model_type}'")
+        except Exception as e:
+            print(f"Error saving model_parts.csv: {e}")
 
 
-def load_presets():
-    preset_file = get_preset_path()
-    if os.path.exists(preset_file):
-        with open(preset_file, 'r', encoding='utf-8') as handle:
-            try:
-                return json.load(handle)
-            except json.JSONDecodeError:
-                return {}
-    return {}
+def remove_furniture_preset(value):
+    if value and value in FURNITURE_DATA:
+        FURNITURE_DATA.remove(value)
+        # Sort not strictly needed on remove, but keeps list clean if we ever re-sort
+        save_list_to_csv(FURNITURE_DATA, "model.csv", "Vật dụng (Item)")
+
+def remove_material_preset(value):
+    if value and value in MATERIAL_DATA:
+        MATERIAL_DATA.remove(value)
+        save_list_to_csv(MATERIAL_DATA, "material.csv", "Vật liệu (Material)")
+
+def remove_part_preset(model_type, value):
+    if not model_type or not value: return
+    
+    parts = MODEL_PARTS_DATA.get(model_type, [])
+    if value in parts:
+        parts.remove(value)
+        MODEL_PARTS_DATA[model_type] = parts
+        
+        filepath = get_csv_path("model_parts.csv")
+        try:
+            with open(filepath, 'w', encoding='utf-8', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(["STT", "Đồ vật (Item)", "Bộ phận chính (Parts)"])
+                for idx, (m_type, m_parts) in enumerate(MODEL_PARTS_DATA.items(), 1):
+                    writer.writerow([idx, m_type, ", ".join(m_parts)])
+            print(f"Removed part '{value}' from '{model_type}' in model_parts.csv")
+        except Exception as e:
+            print(f"Error saving model_parts.csv: {e}")
 
 
-def save_presets(data):
-    preset_file = get_preset_path()
-    with open(preset_file, 'w', encoding='utf-8') as handle:
-        json.dump(data, handle, indent=4)
-
-
-def add_preset(preset_type, value):
-    if not value:
-        return
-    presets = load_presets()
-    presets.setdefault(preset_type, [])
-    if value not in presets[preset_type]:
-        presets[preset_type].append(value)
-        save_presets(presets)
-
-
-def draw_preset_input(layout, settings, prop_name, preset_type, menu_idname):
+def draw_preset_input(layout, settings, prop_name, add_operator, remove_operator=None, icon="ADD"):
     row = layout.row(align=True)
     row.prop(settings, prop_name)
-    row.menu(menu_idname, icon='DOWNARROW_HLT', text="")
-    op = row.operator("sklum.add_preset", text="", icon='ADD')
-    op.preset_type = preset_type
+    # Add button
+    op = row.operator(add_operator, text="", icon=icon)
     op.value_to_add = getattr(settings, prop_name)
+    
+    # Remove button (if provided)
+    if remove_operator:
+        op_rem = row.operator(remove_operator, text="", icon="REMOVE")
+        # Assuming remove operators also use 'value_to_add' property for consistency, 
+        # or we might need to update them to use 'value_to_remove'.
+        # Let's use 'value_to_add' as the carrier for the value since it's common structure.
+        op_rem.value_to_add = getattr(settings, prop_name)
 
 
 # --- CSV Path Update ---
