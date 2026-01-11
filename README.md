@@ -3,7 +3,7 @@
 **Tác giả:** AndiuS  
 **Phiên bản:** 2.5.4  
 **Blender:** 4.2.0+  
-**Nguồn:** [https://github.com/andius/SKLUM_Tools](https://github.com/andius/SKLUM_Tools)
+**Nguồn:** [https://github.com/andiusndd/sklum_tools](https://github.com/andiusndd/sklum_tools)
 
 SKLUM Tools cung cấp bộ tiện ích kiểm tra chất lượng mô hình (QA), tự động hoá đổi tên và hỗ trợ quy trình import/export dành cho pipeline sản xuất chuyên nghiệp.
 

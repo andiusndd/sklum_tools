@@ -1,11 +1,11 @@
 schema_version = "1.0.0"
 id = "sklum_tools"
-version = "2.7.3"
+version = "2.7.4"
 name = "SKLUM Tools"
 tagline = "Toolkit for mesh, material checking and automation."
 maintainer = "Nguyen Duc Duong"
 type = "add-on"
-website = "https://github.com/your-repo/SKLUMToolz"
+website = "https://github.com/andiusndd/sklum_tools"
 tags = ["3D View", "Mesh", "Productivity"]
 blender_version_min = "4.2.0"
 license = ["GPL-2.0-or-later"]

@@ -1,4 +1,9 @@
 
+## [v2.7.4] - 2026-01-12
+### Changed
+- **Repository URL**: Updated all references to `https://github.com/andiusndd/sklum_tools.git`.
+- **Metadata**: Updated `blender_manifest.toml` and `README.md` with correct project links.
+
 ## [v2.7.3] - 2026-01-12
 ### Added
 - **Auto-Update**: Added automatic update feature direct from GitHub.
