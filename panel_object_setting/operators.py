@@ -261,6 +261,60 @@ class SKLUM_OT_ParentAction(Operator):
             bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
         return {'FINISHED'}
 
+class SKLUM_OT_ToggleColor(Operator):
+    """Bật/Tắt chế độ màu Random"""
+    bl_idname = "sklum.toggle_color"
+    bl_label = "Toggle Random Color"
+    
+    def execute(self, context):
+        shading = context.space_data.shading
+        if shading.color_type == 'RANDOM':
+            shading.color_type = 'MATERIAL' # Revert to default
+        else:
+            shading.color_type = 'RANDOM'
+        return {'FINISHED'}
+
+class SKLUM_OT_ToggleLight(Operator):
+    """Bật/Tắt chế độ ánh sáng Flat"""
+    bl_idname = "sklum.toggle_light"
+    bl_label = "Toggle Flat Light"
+    
+    def execute(self, context):
+        shading = context.space_data.shading
+        if shading.light == 'FLAT':
+            shading.light = 'STUDIO' # Revert to default
+        else:
+            shading.light = 'FLAT'
+        return {'FINISHED'}
+
+class SKLUM_OT_ToggleGizmo(Operator):
+    """Bật/Tắt Gizmo (Move, Rotate, Scale)"""
+    bl_idname = "sklum.toggle_gizmo"
+    bl_label = "Toggle Gizmo"
+    
+    type: StringProperty() # 'TRANSLATE', 'ROTATE', 'SCALE'
+    
+    def execute(self, context):
+        gizmo = context.space_data.overlay
+        # Note: In Blender, object gizmos are managed via SpaceView3D.show_gizmo_object_*
+        # But 'overlay' prop usually covers general visibility. 
+        # Actually, these are directly on SpaceView3D or Overlay struct depending on version.
+        # Checking 'context.space_data.show_gizmo_object_translate'
+        
+        space = context.space_data
+        if self.type == 'TRANSLATE':
+            space.show_gizmo_object_translate = not space.show_gizmo_object_translate
+        elif self.type == 'ROTATE':
+            space.show_gizmo_object_rotate = not space.show_gizmo_object_rotate
+        elif self.type == 'SCALE':
+            space.show_gizmo_object_scale = not space.show_gizmo_object_scale
+            
+        # Ensure main Gizmo toggle is ON if we enable any specific one
+        if space.show_gizmo_object_translate or space.show_gizmo_object_rotate or space.show_gizmo_object_scale:
+            space.show_gizmo = True
+            
+        return {'FINISHED'}
+
 classes = (
     SKLUM_OT_ObjectRename,
     SKLUM_OT_SelectByType,
@@ -270,6 +324,9 @@ classes = (
     SKLUM_OT_MaterialAction,
     SKLUM_OT_SetLocation,
     SKLUM_OT_ParentAction,
+    SKLUM_OT_ToggleColor,
+    SKLUM_OT_ToggleLight,
+    SKLUM_OT_ToggleGizmo,
 )
 
 def register():

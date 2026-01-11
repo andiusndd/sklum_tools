@@ -2,6 +2,14 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [v2.6.10] - 2026-01-11
+### Improved
+- **UI & Localization**: Việt hóa toàn bộ panel Object Setting.
+- **Toggles**: 
+  - Nút **Random Color** và **Flat Color** giờ có thể bật/tắt (toggle) thay vì chỉ bật.
+  - Sửa lỗi nút **Render** hiển thị ngược trạng thái.
+- **New Feature**: Thêm nhóm **Trục điều khiển (Gizmos)** để bật/tắt nhanh Move/Rotate/Scale.
+
 ## [v2.6.9] - 2026-01-11
 ### Improved
 - **Custom Origin UI**: Cải thiện giao diện trực quan hơn.
