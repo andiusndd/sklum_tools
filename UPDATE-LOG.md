@@ -1,4 +1,10 @@
 
+## [v2.7.8] - 2026-01-12
+### Changed
+- **UI**: Redesigned `panel_version_info` to a compact 2-row layout.
+- **UI**: Moved version tag (faint) to the left and check/update buttons to the right.
+- **UI**: Removed heart icon for a cleaner, professional look.
+
 ## [v2.7.7] - 2026-01-12
 ### Changed
 - **Export**: Official v2.7.7 release.

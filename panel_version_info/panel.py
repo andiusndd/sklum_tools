@@ -89,30 +89,38 @@ class VIEW3D_PT_sklum_version_info(Panel):
 
     def draw(self, context):
         layout = self.layout
+        settings = context.scene.sklum_update_settings
         
         # Get version from local manifest
         version_str = f"v{get_local_version()}"
 
-        # Custom Box for Info
-        box = layout.box()
-        row = box.row()
-        row.alignment = 'CENTER'
-        # Heart icon requested
-        row.label(text=f"SKLUM Tools {version_str}", icon='HEART')
-
-        # Update section
-        settings = context.scene.sklum_update_settings
+        # Row 1: Version (Left, faint) + Buttons (Right)
+        row1 = layout.row(align=True)
         
-        update_box = layout.box()
-        update_row = update_box.row(align=True)
-        update_row.label(text=settings.status_message, icon='INFO')
+        # Left: Version string (Greyed out/faint)
+        left = row1.row()
+        left.alignment = 'LEFT'
+        left.enabled = False
+        left.label(text=version_str)
         
-        if not settings.is_checking:
-            update_row.operator("sklum.check_update", text="", icon='FILE_REFRESH')
+        # Right: Buttons clump
+        right = row1.row(align=True)
+        right.alignment = 'RIGHT'
+        
+        if settings.is_checking:
+            right.label(text="", icon='UI_STATS')
+        else:
+            # Check/Refresh button
+            right.operator("sklum.check_update", text="", icon='FILE_REFRESH')
             
-        if settings.is_update_available:
-            install_row = update_box.row()
-            install_row.operator("sklum.install_update", text="Update Now", icon='IMPORT')
+            # Update button only if version is available
+            if settings.is_update_available:
+                right.operator("sklum.install_update", text="Update", icon='IMPORT')
+
+        # Row 2: Status Message
+        row2 = layout.row(align=True)
+        # Using a small separator to give it some air if needed, otherwise just label
+        row2.label(text=settings.status_message, icon='NONE')
 
 
 classes = (
