@@ -126,23 +126,35 @@ class SKLUM_OT_QuickOrigin(Operator):
                 settings = context.scene.sklum_object_settings
                 saved_cursor = context.scene.cursor.location.copy()
                 
+                # Get World Space BBox Corners
                 bbox_corners = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
                 
-                # Calculate Z position based on origin_target_z
-                if settings.origin_target_z == 'BOTTOM':
-                    z_pos = min(corner.z for corner in bbox_corners)
-                elif settings.origin_target_z == 'TOP':
-                    z_pos = max(corner.z for corner in bbox_corners)
-                else:  # CENTER
-                    z_pos = sum(corner.z for corner in bbox_corners) / 8
+                min_x = min(c.x for c in bbox_corners)
+                max_x = max(c.x for c in bbox_corners)
+                center_x = (min_x + max_x) / 2.0
                 
-                # Calculate XY position based on origin_target_xy
-                if settings.origin_target_xy == 'CENTER':
-                    x_pos = sum(corner.x for corner in bbox_corners) / 8
-                    y_pos = sum(corner.y for corner in bbox_corners) / 8
-                else:  # ORIGIN (0,0)
-                    x_pos = 0
-                    y_pos = 0
+                min_y = min(c.y for c in bbox_corners)
+                max_y = max(c.y for c in bbox_corners)
+                center_y = (min_y + max_y) / 2.0
+                
+                min_z = min(c.z for c in bbox_corners)
+                max_z = max(corner.z for corner in bbox_corners)
+                center_z = (min_z + max_z) / 2.0
+
+                # X
+                if settings.origin_align_x == 'MIN': x_pos = min_x
+                elif settings.origin_align_x == 'MAX': x_pos = max_x
+                else: x_pos = center_x
+                
+                # Y
+                if settings.origin_align_y == 'MIN': y_pos = min_y
+                elif settings.origin_align_y == 'MAX': y_pos = max_y
+                else: y_pos = center_y
+                
+                # Z
+                if settings.origin_align_z == 'MIN': z_pos = min_z
+                elif settings.origin_align_z == 'MAX': z_pos = max_z
+                else: z_pos = center_z
                 
                 context.scene.cursor.location = (x_pos, y_pos, z_pos)
                 bpy.ops.object.origin_set(type='ORIGIN_CURSOR')

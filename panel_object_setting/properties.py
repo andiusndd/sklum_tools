@@ -18,31 +18,35 @@ class SKLUM_PG_ObjectSettings(PropertyGroup):
     )
 
     # Custom Origin
-    origin_target_z: EnumProperty(
-        name="Z Alignment",
+    # Custom Origin
+    origin_align_x: EnumProperty(
+        name="X Align",
         items=[
-            ('BOTTOM', "Bottom", "Align origin to bottom"),
-            ('CENTER', "Center", "Align origin to center"),
-            ('TOP', "Top", "Align origin to top"),
-        ],
-        default='BOTTOM'
-    )
-    origin_target_xy: EnumProperty(
-        name="XY Alignment",
-        items=[
-            ('CENTER', "Center", "Align origin to center on XY"),
-            ('ORIGIN', "Origin", "Align origin to zero on XY"),
+            ('MIN', "Min (-)", "Align to Left/Min X"),
+            ('CENTER', "Center", "Align to Center X"),
+            ('MAX', "Max (+)", "Align to Right/Max X"),
         ],
         default='CENTER'
     )
-    origin_target_mode: EnumProperty(
-        name="Mode",
+    origin_align_y: EnumProperty(
+        name="Y Align",
         items=[
-            ('MIDDLE', "Middle", "Middle alignment"),
-            # Add more if needed based on further requirements
+            ('MIN', "Min (-)", "Align to Front/Min Y"),
+            ('CENTER', "Center", "Align to Center Y"),
+            ('MAX', "Max (+)", "Align to Back/Max Y"),
         ],
-        default='MIDDLE'
+        default='CENTER'
     )
+    origin_align_z: EnumProperty(
+        name="Z Align",
+        items=[
+            ('MIN', "Min (-)", "Align to Bottom/Min Z"),
+            ('CENTER', "Center", "Align to Center Z"),
+            ('MAX', "Max (+)", "Align to Top/Max Z"),
+        ],
+        default='MIN'
+    )
+    # Deprecated: origin_target_mode, origin_target_z, origin_target_xy
 
     # Set Location
     location_axis: EnumProperty(

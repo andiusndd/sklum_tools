@@ -2,6 +2,13 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [v2.6.8] - 2026-01-11
+### Fixed
+- **Custom Origin**: Sửa lỗi thiếu tùy chọn và tính toán sai.
+  - Thêm 3 dropdown riêng biệt cho X, Y, Z (Min/Center/Max).
+  - Nút "Set Origin" to rõ, dễ thao tác.
+  - Logic tính toán dựa trên Bounding Box chuẩn xác hơn.
+
 ## [v2.6.7] - 2026-01-11
 ### Changed
 - **UI Object Setting**: Cải thiện giao diện, chuyển sang bố cục dọc thoáng hơn.
