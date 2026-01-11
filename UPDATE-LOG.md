@@ -2,6 +2,15 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [2.5.5] - 2026-01-11
+### Added
+- Hàm `_trace_to_principled_bsdf()` để trace kết nối texture qua các node trung gian.
+- Mở rộng `TEXTURE_TYPE_MAPPING` với tất cả các socket của Principled BSDF (Transmission, Coat, Sheen, Emission, Thin Film...).
+
+### Fixed
+- Sửa lỗi đổi tên texture không nhận diện được khi cắm gián tiếp vào Principled BSDF (ví dụ: Transmission > Weight).
+- Node texture giờ được đổi tên label (e.g., "TRANSMISSION") cùng với file texture.
+
 ## [2.5.4] - 2026-01-11
 ### Added
 - Thêm file `update-log.md` để theo dõi lịch sử cập nhật.

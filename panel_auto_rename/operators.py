@@ -194,9 +194,13 @@ class SKLUM_OT_AutoRenameExecute(Operator):
             if node.type != 'TEX_IMAGE' or not node.image:
                 continue
 
+            # Trace to find the Principled BSDF socket this texture connects to
+            bsdf_socket_name = self._trace_to_principled_bsdf(node)
+            
             tex_suffix = None
             color_space = None
 
+            # Check for Normal Map first (special case)
             is_normal = False
             for output in node.outputs:
                 if output.is_linked:
@@ -208,17 +212,16 @@ class SKLUM_OT_AutoRenameExecute(Operator):
                     if is_normal:
                         break
 
-            if not is_normal:
-                for output in node.outputs:
-                    if output.is_linked:
-                        for link in output.links:
-                            socket_name = link.to_socket.name
-                            if socket_name in constants.TEXTURE_TYPE_MAPPING:
-                                tex_suffix, color_space, _ = constants.TEXTURE_TYPE_MAPPING[socket_name]
-                                break
-                    if tex_suffix:
-                        break
+            # Use traced BSDF socket if available
+            if not is_normal and bsdf_socket_name:
+                if bsdf_socket_name in constants.TEXTURE_TYPE_MAPPING:
+                    tex_suffix, color_space, _ = constants.TEXTURE_TYPE_MAPPING[bsdf_socket_name]
+                else:
+                    # Fallback: use socket name directly as suffix
+                    tex_suffix = f"_{bsdf_socket_name.replace(' ', '')}"
+                    color_space = constants.COLOR_SPACE_NON_COLOR
 
+            # Fallback to keyword-based detection
             if not tex_suffix:
                 search_terms = node.name.lower() + (node.label.lower() if node.label else "")
                 if any(keyword in search_terms for keyword in constants.NORMAL_MAP_CONFIG[2]):
@@ -231,10 +234,18 @@ class SKLUM_OT_AutoRenameExecute(Operator):
 
             if tex_suffix and color_space:
                 new_name = f"{base_name}{tex_suffix}{suffix}" if base_name else f"Texture{tex_suffix}{suffix}"
+                
+                # Rename node label (e.g., "TRANSMISSION")
+                node_label = tex_suffix.strip("_").upper()
+                if node.label != node_label:
+                    node.label = node_label
+                
+                # Rename image datablock
                 if node.image.name != new_name:
                     node.image.name = new_name
                 node.image.colorspace_settings.name = color_space
 
+                # Rename file on disk
                 if node.image.source == 'FILE' and node.image.filepath:
                     try:
                         old_filepath = bpy.path.abspath(node.image.filepath)
@@ -246,6 +257,39 @@ class SKLUM_OT_AutoRenameExecute(Operator):
                                 node.image.filepath = bpy.path.relpath(new_filepath)
                     except Exception as exc:
                         print(f"Lỗi khi đổi tên file texture {node.image.name}: {exc}")
+
+    def _trace_to_principled_bsdf(self, start_node, visited=None, depth=0):
+        """
+        Trace từ một node texture để tìm socket của Principled BSDF mà nó kết nối đến.
+        Đệ quy qua các node trung gian (Mix, Math, Separate, etc.)
+        Returns: Tên socket trên Principled BSDF (e.g., "Transmission Weight") hoặc None
+        """
+        if visited is None:
+            visited = set()
+
+        if depth > 10 or start_node in visited:
+            return None
+
+        visited.add(start_node)
+
+        for output in start_node.outputs:
+            if not output.is_linked:
+                continue
+
+            for link in output.links:
+                to_node = link.to_node
+                to_socket = link.to_socket
+
+                # Found Principled BSDF
+                if to_node.type == 'BSDF_PRINCIPLED':
+                    return to_socket.name
+
+                # Continue tracing through intermediate nodes
+                result = self._trace_to_principled_bsdf(to_node, visited, depth + 1)
+                if result:
+                    return result
+
+        return None
 
 
 classes = (

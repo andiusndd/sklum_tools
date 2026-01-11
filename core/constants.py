@@ -25,11 +25,48 @@ BASE_COLOR_KEYWORDS = [
 ]
 
 # Texture type mapping dùng chung cho color space và auto rename
+# Format: "Socket Name": (suffix, colorspace, [keywords])
 TEXTURE_TYPE_MAPPING = {
-    "Base Color": ("_Diffuse", COLOR_SPACE_SRGB, ["diffuse", "albedo", "base_color"]),
-    "Metallic": ("_RMA", COLOR_SPACE_NON_COLOR, ["metallic", "rma"]),
-    "Roughness": ("_RMA", COLOR_SPACE_NON_COLOR, ["roughness"]),
-    "Alpha": ("_Alpha", COLOR_SPACE_SRGB, ["alpha"]),
+    # ===== Main Inputs =====
+    "Base Color": ("_Diffuse", COLOR_SPACE_SRGB, ["diffuse", "albedo", "base_color", "basecolor"]),
+    "Metallic": ("_Metallic", COLOR_SPACE_NON_COLOR, ["metallic", "metal"]),
+    "Roughness": ("_Roughness", COLOR_SPACE_NON_COLOR, ["roughness", "rough"]),
+    "Alpha": ("_Alpha", COLOR_SPACE_SRGB, ["alpha", "opacity"]),
+    "IOR": ("_IOR", COLOR_SPACE_NON_COLOR, ["ior"]),
+    
+    # ===== Subsurface =====
+    "Subsurface Weight": ("_Subsurface", COLOR_SPACE_NON_COLOR, ["subsurface", "sss"]),
+    "Subsurface Radius": ("_SubsurfaceRadius", COLOR_SPACE_SRGB, ["subsurface_radius"]),
+    "Subsurface Scale": ("_SubsurfaceScale", COLOR_SPACE_NON_COLOR, ["subsurface_scale"]),
+    
+    # ===== Specular =====
+    "Specular IOR Level": ("_Specular", COLOR_SPACE_NON_COLOR, ["specular", "spec"]),
+    "Specular Tint": ("_SpecularTint", COLOR_SPACE_SRGB, ["specular_tint"]),
+    "Anisotropic": ("_Anisotropic", COLOR_SPACE_NON_COLOR, ["anisotropic", "aniso"]),
+    "Anisotropic Rotation": ("_AnisotropicRotation", COLOR_SPACE_NON_COLOR, ["anisotropic_rotation"]),
+    
+    # ===== Transmission =====
+    "Transmission Weight": ("_Transmission", COLOR_SPACE_NON_COLOR, ["transmission", "trans"]),
+    
+    # ===== Coat =====
+    "Coat Weight": ("_Coat", COLOR_SPACE_NON_COLOR, ["coat", "clearcoat"]),
+    "Coat Roughness": ("_CoatRoughness", COLOR_SPACE_NON_COLOR, ["coat_roughness"]),
+    "Coat IOR": ("_CoatIOR", COLOR_SPACE_NON_COLOR, ["coat_ior"]),
+    "Coat Tint": ("_CoatTint", COLOR_SPACE_SRGB, ["coat_tint"]),
+    "Coat Normal": ("_CoatNormal", COLOR_SPACE_NON_COLOR, ["coat_normal"]),
+    
+    # ===== Sheen =====
+    "Sheen Weight": ("_Sheen", COLOR_SPACE_NON_COLOR, ["sheen"]),
+    "Sheen Roughness": ("_SheenRoughness", COLOR_SPACE_NON_COLOR, ["sheen_roughness"]),
+    "Sheen Tint": ("_SheenTint", COLOR_SPACE_SRGB, ["sheen_tint"]),
+    
+    # ===== Emission =====
+    "Emission Color": ("_Emission", COLOR_SPACE_SRGB, ["emission", "emissive", "glow"]),
+    "Emission Strength": ("_EmissionStrength", COLOR_SPACE_NON_COLOR, ["emission_strength"]),
+    
+    # ===== Thin Film =====
+    "Thin Film Thickness": ("_ThinFilm", COLOR_SPACE_NON_COLOR, ["thin_film"]),
+    "Thin Film IOR": ("_ThinFilmIOR", COLOR_SPACE_NON_COLOR, ["thin_film_ior"]),
 }
 
 NORMAL_MAP_CONFIG = ("_Normal", COLOR_SPACE_NON_COLOR, ["normal"])
