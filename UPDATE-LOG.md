@@ -1,10 +1,10 @@
-# SKLUM Tools - Update Log
 
-Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
-
-
-
-
+## [v2.7.3] - 2026-01-12
+### Added
+- **Auto-Update**: Added automatic update feature direct from GitHub.
+- **Check Update**: New button in "SKLUM Tools Info" to check for latest version.
+- **Auto-Install**: One-click download and installation of the latest version via ZIP from the master branch.
+- **Networking**: Added `requests` dependency logic to handle GitHub API and downloads.
 
 ## [v2.7.2] - 2026-01-12
 ### Added

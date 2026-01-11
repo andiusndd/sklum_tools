@@ -4,6 +4,11 @@ Utils - Các hàm tiện ích dùng chung
 
 import bpy
 import math
+import os
+import requests
+import zipfile
+import shutil
+import tempfile
 from .constants import ORIGIN_TOLERANCE
 
 
@@ -70,3 +75,93 @@ def safe_mode_set(mode):
     """Chuyển mode an toàn, chỉ khi có object được chọn"""
     if bpy.context.selected_objects:
         bpy.ops.object.mode_set(mode=mode)
+
+
+def check_for_update(repo_url):
+    """
+    Kiểm tra phiên bản mới từ GitHub.
+    Returns: (is_update_available, latest_version_str, error_msg)
+    """
+    try:
+        # Convert git URL to raw manifest URL
+        # From: https://github.com/andiusndd/sklum_tools.git
+        # To: https://raw.githubusercontent.com/andiusndd/sklum_tools/master/blender_manifest.toml
+        raw_base = repo_url.replace("github.com", "raw.githubusercontent.com").replace(".git", "")
+        manifest_url = f"{raw_base}/master/blender_manifest.toml"
+        
+        response = requests.get(manifest_url, timeout=10)
+        response.raise_for_status()
+        
+        import tomllib
+        manifest_data = tomllib.loads(response.text)
+        remote_version_str = manifest_data.get("version", "0.0.0")
+        
+        # Get local version
+        from .. import bl_info
+        local_version = bl_info.get("version", (0, 0, 0))
+        local_version_str = f"{local_version[0]}.{local_version[1]}.{local_version[2]}"
+        
+        # Simple string comparison or tuple comparison if formatted correctly
+        if remote_version_str != local_version_str:
+            return True, remote_version_str, None
+        return False, local_version_str, None
+        
+    except Exception as e:
+        return False, None, str(e)
+
+
+def download_and_install_update(repo_url):
+    """
+    Tải về và cài đặt bản cập nhật từ GitHub.
+    """
+    try:
+        # Construct ZIP download URL
+        # From: https://github.com/andiusndd/sklum_tools.git
+        # To: https://github.com/andiusndd/sklum_tools/archive/refs/heads/master.zip
+        zip_url = repo_url.replace(".git", "") + "/archive/refs/heads/master.zip"
+        
+        response = requests.get(zip_url, stream=True, timeout=30)
+        response.raise_for_status()
+        
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".zip") as tmp_file:
+            for chunk in response.iter_content(chunk_size=8192):
+                tmp_file.write(chunk)
+            tmp_path = tmp_file.name
+            
+        # Get addon directory
+        addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        parent_dir = os.path.dirname(addon_dir)
+        addon_name = os.path.basename(addon_dir)
+        
+        with zipfile.ZipFile(tmp_path, 'r') as zip_ref:
+            # Extract to a temp directory first
+            temp_extract_dir = tempfile.mkdtemp()
+            zip_ref.extractall(temp_extract_dir)
+            
+            # The zip usually contains a folder named "repo_name-master"
+            extracted_folders = os.listdir(temp_extract_dir)
+            if not extracted_folders:
+                raise Exception("Zip file is empty")
+            
+            source_dir = os.path.join(temp_extract_dir, extracted_folders[0])
+            
+            # Replace files in the current addon directory
+            # WARNING: This is destructive to the current session until restart
+            for item in os.listdir(source_dir):
+                s = os.path.join(source_dir, item)
+                d = os.path.join(addon_dir, item)
+                if os.path.isdir(s):
+                    if os.path.exists(d):
+                        shutil.rmtree(d)
+                    shutil.copytree(s, d)
+                else:
+                    shutil.copy2(s, d)
+            
+            # Cleanup temp files
+            shutil.rmtree(temp_extract_dir)
+            os.remove(tmp_path)
+            
+        return True, "Update installed successfully. Please restart Blender."
+        
+    except Exception as e:
+        return False, str(e)
