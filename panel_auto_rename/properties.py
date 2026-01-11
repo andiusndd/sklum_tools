@@ -35,10 +35,28 @@ def get_furniture_items(self, context):
     return [(item, item, f"Furniture type: {item}") for item in furniture_list]
 
 
+def get_material_items(self, context):
+    """Returns 35 material items for material_name dropdown."""
+    material_list = [
+        "Acrylic", "Aluminum", "Bamboo", "Brass", "Ceramic", "Concrete", "Copper",
+        "Cotton", "Faux leather", "Foam", "Granite", "Hardwood", "Iron", "Leather",
+        "Linen", "Marble", "MDF", "Plastic", "Plywood", "Polyester", "Quartz",
+        "Rattan", "Resin", "Rubber", "Silk", "Softwood", "Solidwood", "Stainless steel",
+        "Steel", "Tempered glass", "Velvet", "Veneer", "Wool", "Wrought iron"
+    ]
+    
+    # Return as enum items: (identifier, name, description)
+    return [(item, item, f"Material: {item}") for item in material_list]
+
+
 class SKLUM_PG_AutoRenameItem(PropertyGroup):
     original_name: StringProperty()
     mesh_name: StringProperty(name="Tên")
-    material_name: StringProperty(name="Tên VL")
+    material_name: EnumProperty(
+        name="Tên VL",
+        items=get_material_items,
+        description="Select material type from preset list"
+    )
 
 
 class SKLUM_PG_AutoRenameSettings(PropertyGroup):
