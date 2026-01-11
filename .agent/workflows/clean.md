@@ -20,7 +20,13 @@ Workflow này dùng để dọn dẹp các file rác và build artifacts để p
     - Chạy: `python _clean_project.py`
 
 3.  **Xóa Script**:
-    - Tự xóa file `_clean_project.py` sau khi hoàn tất (hoặc giữ lại tùy ý).
+    - Tự xóa file `_clean_project.py` sau khi hoàn tất.
+
+4.  **Đồng bộ Git (Push)**:
+    - Sau khi dọn dẹp, đẩy trạng thái sạch sẽ của project lên GitHub.
+    ```powershell
+    git add -A; git commit -m "Clean up project and build artifacts"; git push github_repo main
+    ```
 
 ## Ví dụ
 
