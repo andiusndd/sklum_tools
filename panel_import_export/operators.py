@@ -445,7 +445,10 @@ class SKLUM_OT_create_box(Operator):
         obj.lock_rotation = (True, True, True)
         obj.lock_scale = (True, True, True)
         
-        self.report({'INFO'}, f"Đã tạo Box tham chiếu: {x:.1f}x{y:.1f}x{z:.1f} (Wireframe, Locked)")
+        # Disable Selection (Make it unselectable)
+        obj.hide_select = True
+        
+        self.report({'INFO'}, f"Đã tạo Box tham chiếu: {x:.1f}x{y:.1f}x{z:.1f} (Wireframe, Locked, Unselectable)")
         return {'FINISHED'}
 
 

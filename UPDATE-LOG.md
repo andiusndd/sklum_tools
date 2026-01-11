@@ -8,6 +8,7 @@ Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ 
   - Chỉ tạo duy nhất 1 box (tự xóa box cũ).
   - Hiển thị dạng Wireframe.
   - Khóa di chuyển/xoay/scale để làm tham chiếu cố định.
+  - Tắt khả năng chọn (unselectable) để tránh thao tác nhầm.
 - **Import/Export Panel**: Sửa lỗi `ImportError` do import sai `PropertyGroup` từ `bpy.props` thay vì `bpy.types`.
 
 ## [v2.6.14] - 2026-01-11
