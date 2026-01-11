@@ -2,8 +2,9 @@
 
 from . import operators
 from . import panel
+from . import properties
 
-modules = [operators, panel]
+modules = [properties, operators, panel]
 
 
 def register():

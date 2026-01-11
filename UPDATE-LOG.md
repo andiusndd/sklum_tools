@@ -2,6 +2,10 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [v2.6.14] - 2026-01-11
+### Fixed
+- **Import/Export Panel**: Sửa lỗi `AttributeError` khi tạo Box do chưa đăng ký property settings.
+
 ## [v2.6.13] - 2026-01-11
 ### Added
 - **Import/Export Panel**: Thêm tính năng **Tạo Box** nhanh.
