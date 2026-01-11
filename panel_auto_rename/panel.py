@@ -29,7 +29,7 @@ class VIEW3D_PT_sklum_auto_rename(Panel):
         row = box.row()
         row.prop(settings, "idp")
 
-        utils.draw_preset_input(box, settings, "model_type", "model_types", "SKLUM_MT_model_type_presets")
+        box.prop(settings, "model_type")
 
         row = box.row()
         row.prop(settings, "main_material", text="Collection")

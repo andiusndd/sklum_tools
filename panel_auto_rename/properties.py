@@ -4,12 +4,35 @@ import bpy
 from bpy.types import PropertyGroup
 from bpy.props import (
     StringProperty,
+    EnumProperty,
     CollectionProperty,
     PointerProperty,
     IntProperty,
 )
 
 from . import utils
+
+
+def get_furniture_items(self, context):
+    """Returns 100 furniture items sorted A-Z for model_type dropdown."""
+    furniture_list = [
+        "Armchair", "Basin", "Bed", "Bench", "Bin", "Blanket", "Blender", "Blinds",
+        "Bookshelf", "Bowl", "Broom", "Brush", "Bucket", "Bulb", "Cabinet", "Candle",
+        "Canister", "Carpet", "Chair", "Chandelier", "Closet", "Clock", "Comb", "Comforter",
+        "Cot", "Couch", "Cradle", "Cup", "Cupboard", "Curtains", "Cushion", "Desk",
+        "Dish", "Drapes", "Dresser", "Dryer", "Duvet", "Fan", "Faucet", "Fork",
+        "Frame", "Freezer", "Fridge", "Futon", "Glass", "Hammock", "Heater", "Iron",
+        "Jar", "Jug", "Kettle", "Knife", "Ladle", "Lamp", "Lantern", "Mat",
+        "Mattress", "Microwave", "Mirror", "Mixer", "Mop", "Mug", "Nightstand", "Ottoman",
+        "Oven", "Painting", "Pan", "Photo", "Pillow", "Pitcher", "Plant", "Plate",
+        "Poster", "Pot", "Quilt", "Recliner", "Rug", "Shelf", "Sheet", "Shower",
+        "Sideboard", "Sink", "Soap", "Sofa", "Sponge", "Spoon", "Statue", "Stool",
+        "Stove", "Table", "Tap", "Toaster", "Toilet", "Towel", "Tray", "Tub",
+        "Vase", "Wardrobe", "Washer", "Wok"
+    ]
+    
+    # Return as enum items: (identifier, name, description)
+    return [(item, item, f"Furniture type: {item}") for item in furniture_list]
 
 
 class SKLUM_PG_AutoRenameItem(PropertyGroup):
@@ -24,7 +47,11 @@ class SKLUM_PG_AutoRenameSettings(PropertyGroup):
         update=lambda self, context: self.update_idp_and_collection_from_model_id(context),
     )
     idp: StringProperty(name="IDP")
-    model_type: StringProperty(name="Loại Model")
+    model_type: EnumProperty(
+        name="Loại Model",
+        items=get_furniture_items,
+        description="Select furniture type from preset list"
+    )
     main_material: StringProperty(name="Collection")
 
     csv_filepath: StringProperty(
