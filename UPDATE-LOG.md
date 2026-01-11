@@ -2,6 +2,13 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [v2.6.13] - 2026-01-11
+### Added
+- **Import/Export Panel**: Thêm tính năng **Tạo Box** nhanh.
+  - Cho phép nhập kích thước X, Y, Z.
+  - Tự động tạo Box, áp dụng scale, đặt gốc tọa độ (Origin) tại mặt đáy.
+  - Đưa đối tượng về vị trí (0, 0, 0).
+
 ## [v2.6.12] - 2026-01-11
 ### Improved
 - **UI/UX**: Tất cả các panel SKLUM giờ mặc định ở trạng thái đóng (collapsed) khi mở Blender.

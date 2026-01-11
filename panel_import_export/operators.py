@@ -382,6 +382,63 @@ class SKLUM_OT_open_gltf_compressor(Operator):
         return {'FINISHED'}
 
 
+class SKLUM_OT_create_box(Operator):
+    bl_idname = "sklum.create_box"
+    bl_label = "Tạo Box"
+    bl_description = "Tạo Box với kích thước chỉ định, tâm ở đáy, vị trí 0,0,0"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        settings = context.scene.sklum_box_settings
+        x, y, z = settings.box_x, settings.box_y, settings.box_z
+        
+        # Create Cube
+        # Create at arbitrary location first to avoid conflict, then move
+        bpy.ops.mesh.primitive_cube_add(size=1, align='WORLD', location=(0, 0, 0))
+        obj = context.active_object
+        
+        # Set Dimensions
+        obj.dimensions = (x, y, z)
+        
+        # Apply Scale
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        
+        # Set Origin to Bottom
+        # 1. Reset origin to geometry center first to be predictable
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
+        
+        # 2. Use Cursor to set origin to bottom center
+        saved_location = context.scene.cursor.location.copy()
+        
+        # Since box is centered at (0,0,0) locally relative to its geometry, 
+        # and we just set origin to median, the bottom face center is at -z/2 locally.
+        # But wait, we need to be careful with world coordinates vs local.
+        # The safest way is to use bounding box.
+        
+        # Get bounds in world space (since we just applied scale)
+        import mathutils
+        bbox_corners = [obj.matrix_world @ mathutils.Vector(corner) for corner in obj.bound_box]
+        
+        min_z = min(c.z for c in bbox_corners)
+        center_x = sum(c.x for c in bbox_corners) / 8
+        center_y = sum(c.y for c in bbox_corners) / 8
+        
+        # Move cursor to bottom center
+        context.scene.cursor.location = (center_x, center_y, min_z)
+        
+        # Set origin to cursor
+        bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+        
+        # Move Object to Global (0,0,0)
+        obj.location = (0, 0, 0)
+        
+        # Restore Cursor
+        context.scene.cursor.location = saved_location
+        
+        self.report({'INFO'}, f"Đã tạo Box {x:.1f}x{y:.1f}x{z:.1f} tại gốc tọa độ.")
+        return {'FINISHED'}
+
+
 classes = (
     SKLUM_OT_purge_unused,
     SKLUM_OT_pack_textures,
@@ -391,6 +448,7 @@ classes = (
     SKLUM_OT_import_material_glb,
     SKLUM_OT_unpack_all_textures,
     SKLUM_OT_open_gltf_compressor,
+    SKLUM_OT_create_box,
 )
 
 

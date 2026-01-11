@@ -27,7 +27,22 @@ class VIEW3D_PT_sklum_import_export(Panel):
         row.operator("sklum.unpack_all_textures", text="Unpack Textures", icon='FILE_FOLDER')
 
         row = layout.row(align=True)
+        row = layout.row(align=True)
         row.operator("sklum.purge_unused", text="Purge Unused", icon='TRASH')
+
+        layout.separator()
+
+        # Create Box Section
+        box = layout.box()
+        box.label(text="Tạo Hộp (Box)", icon='MESH_CUBE')
+        
+        row = box.row(align=True)
+        row.prop(scene.sklum_box_settings, "box_x", text="X")
+        row.prop(scene.sklum_box_settings, "box_y", text="Y")
+        row.prop(scene.sklum_box_settings, "box_z", text="Z")
+        
+        row = box.row()
+        row.operator("sklum.create_box", text="Tạo Mesh Box", icon='ADD')
 
         layout.separator()
 
