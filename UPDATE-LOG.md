@@ -2,6 +2,11 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [2.5.8] - 2026-01-11
+### Added
+- Trường hợp đặc biệt cho nhóm RMA: Các texture cắm vào Roughness, Metallic, hoặc Occlusion sẽ được đặt tên file kết thúc bằng `_RMA`.
+- Tách biệt logic đặt tên file và nhãn node: Nhãn node vẫn giữ đúng tên socket (e.g., `METALLIC`, `ROUGHNESS`) để người dùng dễ phân biệt, trong khi file vật lý được gộp chung hậu tố `_RMA`.
+
 ## [2.5.7] - 2026-01-11
 ### Refactored
 - Chuẩn hóa hoàn toàn logic đổi tên texture: Tất cả các loại texture (bao gồm cả Normal Map) giờ đây đều được xử lý đồng nhất dựa trên vị trí kết nối (Socket).

@@ -196,12 +196,13 @@ class SKLUM_OT_AutoRenameExecute(Operator):
 
             tex_suffix = None
             color_space = None
+            node_label_name = None
 
             # 1. Trace Connection (Universal Priority)
-            # This handles ALL connections including Normal, Transmission, etc.
             bsdf_socket_name = self._trace_to_principled_bsdf(node)
             
             if bsdf_socket_name:
+                node_label_name = bsdf_socket_name
                 if bsdf_socket_name in constants.TEXTURE_TYPE_MAPPING:
                     tex_suffix, color_space, _ = constants.TEXTURE_TYPE_MAPPING[bsdf_socket_name]
                 else:
@@ -213,23 +214,26 @@ class SKLUM_OT_AutoRenameExecute(Operator):
             if not tex_suffix:
                 search_terms = node.name.lower() + (node.label.lower() if node.label else "")
                 # Check mapping keywords first
-                for config in constants.TEXTURE_TYPE_MAPPING.values():
+                for key, config in constants.TEXTURE_TYPE_MAPPING.items():
                     if any(keyword in search_terms for keyword in config[2]):
                         tex_suffix, color_space, _ = config
+                        node_label_name = key
                         break
                 
                 # Check special normal config if still not found
                 if not tex_suffix:
                     if any(keyword in search_terms for keyword in constants.NORMAL_MAP_CONFIG[2]):
                         tex_suffix, color_space, _ = constants.NORMAL_MAP_CONFIG
+                        node_label_name = "Normal"
 
             if tex_suffix and color_space:
                 new_name = f"{base_name}{tex_suffix}{suffix}" if base_name else f"Texture{tex_suffix}{suffix}"
                 
-                # Rename node label (e.g., "TRANSMISSION")
-                node_label = tex_suffix.strip("_").upper()
-                if node.label != node_label:
-                    node.label = node_label
+                # Rename node label (e.g., "METALLIC" even if file is "_RMA")
+                if node_label_name:
+                    final_label = node_label_name.replace(" ", "_").upper()
+                    if node.label != final_label:
+                        node.label = final_label
                 
                 # Rename image datablock
                 if node.image.name != new_name:

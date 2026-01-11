@@ -29,8 +29,9 @@ BASE_COLOR_KEYWORDS = [
 TEXTURE_TYPE_MAPPING = {
     # ===== Main Inputs =====
     "Base Color": ("_Diffuse", COLOR_SPACE_SRGB, ["diffuse", "albedo", "base_color", "basecolor"]),
-    "Metallic": ("_Metallic", COLOR_SPACE_NON_COLOR, ["metallic", "metal"]),
-    "Roughness": ("_Roughness", COLOR_SPACE_NON_COLOR, ["roughness", "rough"]),
+    "Metallic": ("_RMA", COLOR_SPACE_NON_COLOR, ["metallic", "metal"]),
+    "Roughness": ("_RMA", COLOR_SPACE_NON_COLOR, ["roughness", "rough"]),
+    "Ambient Occlusion": ("_RMA", COLOR_SPACE_NON_COLOR, ["occlusion", "ao", "ambient_occlusion"]),
     "Alpha": ("_Alpha", COLOR_SPACE_SRGB, ["alpha", "opacity"]),
     "IOR": ("_IOR", COLOR_SPACE_NON_COLOR, ["ior"]),
     "Normal": ("_Normal", COLOR_SPACE_NON_COLOR, ["normal"]),
