@@ -13,6 +13,20 @@ class SKLUM_UpdateSettings(bpy.types.PropertyGroup):
     status_message: bpy.props.StringProperty(default="Click to check for updates")
     is_checking: bpy.props.BoolProperty(default=False)
 
+def get_local_version():
+    """Lấy phiên bản hiện tại từ blender_manifest.toml."""
+    try:
+        import os
+        import tomllib
+        addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        manifest_path = os.path.join(addon_dir, "blender_manifest.toml")
+        with open(manifest_path, "rb") as f:
+            data = tomllib.load(f)
+        return data.get("version", "0.0.0")
+    except Exception as e:
+        print(f"Error reading manifest: {e}")
+        return "?.?.?"
+
 
 class SKLUM_OT_check_update(Operator):
     """Kiểm tra bản cập nhật mới từ GitHub"""
@@ -76,16 +90,8 @@ class VIEW3D_PT_sklum_version_info(Panel):
     def draw(self, context):
         layout = self.layout
         
-        # Get version from main package
-        version_str = "v?.?.?"
-        try:
-            from .. import bl_info
-            version = bl_info.get("version", (0, 0, 0))
-            version_str = f"v{version[0]}.{version[1]}.{version[2]}"
-        except Exception as e:
-            print(f"Version extraction error: {e}")
-            # Fallback if import fails
-            version_str = "v2.7.2"
+        # Get version from local manifest
+        version_str = f"v{get_local_version()}"
 
         # Custom Box for Info
         box = layout.box()
