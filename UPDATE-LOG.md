@@ -2,6 +2,13 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [v2.6.11] - 2026-01-11
+### Fixed
+- **panel_object_setting**: Sửa lỗi `AttributeError` khi nhấn nút "Hiển thị" (Display) trong nhóm Materials.
+  - Lỗi xảy ra do operator `wm.properties_context_change` không hoạt động khi gọi từ 3D Viewport.
+  - Thay thế bằng logic tìm Properties Editor area và chuyển context trực tiếp.
+  - Thêm thông báo thân thiện nếu không tìm thấy Properties Editor.
+
 ## [v2.6.10] - 2026-01-11
 ### Improved
 - **UI & Localization**: Việt hóa toàn bộ panel Object Setting.

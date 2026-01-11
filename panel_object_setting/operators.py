@@ -216,8 +216,18 @@ class SKLUM_OT_MaterialAction(Operator):
                 if obj.type == 'MESH':
                     obj.data.materials.clear()
         elif self.action == 'DISPLAY':
-            # Logic: Show material properties tab
-            bpy.ops.wm.properties_context_change(context='MATERIAL')
+            # Find Properties Editor and switch to Material context
+            found_properties = False
+            for area in context.screen.areas:
+                if area.type == 'PROPERTIES':
+                    area.spaces.active.context = 'MATERIAL'
+                    found_properties = True
+                    break
+            
+            if not found_properties:
+                # If no Properties Editor exists, inform user
+                self.report({'INFO'}, "Không tìm thấy Properties Editor. Vui lòng mở Properties panel.")
+                return {'CANCELLED'}
         elif self.action == 'RENAME':
             # Logic: Rename main material to object name
             for obj in selected:
