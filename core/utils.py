@@ -116,6 +116,25 @@ def check_for_update(repo_url):
         return False, None, str(e)
 
 
+def safe_remove(path, max_attempts=5, delay=0.5):
+    """
+    Thử xóa file nhiều lần với khoảng trễ để tránh WinError 32 trên Windows.
+    """
+    import time
+    for i in range(max_attempts):
+        try:
+            if os.path.exists(path):
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
+                else:
+                    os.remove(path)
+            return True
+        except Exception as e:
+            print(f"Cleanup attempt {i+1} failed for {path}: {e}")
+            time.sleep(delay)
+    return False
+
+
 def download_and_install_update(repo_url):
     """
     Tải về và cài đặt bản cập nhật từ GitHub.
@@ -127,53 +146,55 @@ def download_and_install_update(repo_url):
         else:
             base_url = repo_url
             
-        zip_url = f"{base_url}/archive/refs/heads/main.zip"
+        tmp_path = None
+        temp_extract_dir = None
         
-        response = requests.get(zip_url, stream=True, timeout=30)
-        response.raise_for_status()
-        
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".zip") as tmp_file:
-            for chunk in response.iter_content(chunk_size=8192):
-                tmp_file.write(chunk)
-            tmp_path = tmp_file.name
+        try:
+            zip_url = f"{base_url}/archive/refs/heads/main.zip"
             
-        # Get addon directory
-        addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        parent_dir = os.path.dirname(addon_dir)
-        addon_name = os.path.basename(addon_dir)
-        
-        with zipfile.ZipFile(tmp_path, 'r') as zip_ref:
-            # Extract to a temp directory first
-            temp_extract_dir = tempfile.mkdtemp()
-            zip_ref.extractall(temp_extract_dir)
+            response = requests.get(zip_url, stream=True, timeout=30)
+            response.raise_for_status()
             
-            # The zip usually contains a folder named "repo_name-main"
-            extracted_folders = os.listdir(temp_extract_dir)
-            if not extracted_folders:
-                raise Exception("Zip file is empty")
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".zip") as tmp_file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    tmp_file.write(chunk)
+                tmp_path = tmp_file.name
+                
+            # Get addon directory
+            addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             
-            source_dir = os.path.join(temp_extract_dir, extracted_folders[0])
+            with zipfile.ZipFile(tmp_path, 'r') as zip_ref:
+                # Extract to a temp directory first
+                temp_extract_dir = tempfile.mkdtemp()
+                zip_ref.extractall(temp_extract_dir)
+                
+                # The zip usually contains a folder named "repo_name-main"
+                extracted_folders = os.listdir(temp_extract_dir)
+                if not extracted_folders:
+                    raise Exception("Zip file is empty")
+                
+                source_dir = os.path.join(temp_extract_dir, extracted_folders[0])
+                
+                # Replace files in the current addon directory
+                for item in os.listdir(source_dir):
+                    s = os.path.join(source_dir, item)
+                    d = os.path.join(addon_dir, item)
+                    if os.path.isdir(s):
+                        if os.path.exists(d):
+                            shutil.rmtree(d)
+                        shutil.copytree(s, d)
+                    else:
+                        shutil.copy2(s, d)
+                
+            return True, "Update installed successfully. Please restart Blender."
             
-            # Replace files in the current addon directory
-            # WARNING: This is destructive to the current session until restart
-            for item in os.listdir(source_dir):
-                s = os.path.join(source_dir, item)
-                d = os.path.join(addon_dir, item)
-                if os.path.isdir(s):
-                    if os.path.exists(d):
-                        shutil.rmtree(d)
-                    shutil.copytree(s, d)
-                else:
-                    shutil.copy2(s, d)
-            
-            # Cleanup temp extract dir (source files)
-            shutil.rmtree(temp_extract_dir)
-            
-        # Cleanup the downloaded ZIP file after closing zipfile handle
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
-            
-        return True, "Update installed successfully. Please restart Blender."
+        finally:
+            # Cleanup source files
+            if temp_extract_dir and os.path.exists(temp_extract_dir):
+                safe_remove(temp_extract_dir)
+            # Cleanup the downloaded ZIP
+            if tmp_path and os.path.exists(tmp_path):
+                safe_remove(tmp_path)
         
     except Exception as e:
         return False, str(e)
