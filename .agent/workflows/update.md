@@ -60,6 +60,9 @@ EXPECTED_RESULT: [Kết quả mong đợi sau khi sửa]
 
 7.  **Tự học (Self-Learning)**: Nếu lỗi xảy ra do một pattern xấu trong code, hãy tạo hoặc cập nhật rule trong `.gemini/rules/` để phòng tránh lỗi tương tự.
 
+8.  **Xác minh cuối cùng**:
+    Khuyến nghị chạy `/test` để đảm bảo bản cập nhật không làm hỏng cấu trúc dự án.
+
 ## Ví dụ sử dụng
 
 ```
