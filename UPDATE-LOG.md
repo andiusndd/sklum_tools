@@ -2,6 +2,12 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [v2.6.12] - 2026-01-11
+### Improved
+- **UI/UX**: Tất cả các panel SKLUM giờ mặc định ở trạng thái đóng (collapsed) khi mở Blender.
+  - Thêm `bl_options = {'DEFAULT_CLOSED'}` vào `panel_checker_tools` và `panel_object_setting`.
+  - Giúp giao diện gọn gàng hơn, người dùng chỉ mở panel cần thiết.
+
 ## [v2.6.11] - 2026-01-11
 ### Fixed
 - **panel_object_setting**: Sửa lỗi `AttributeError` khi nhấn nút "Hiển thị" (Display) trong nhóm Materials.

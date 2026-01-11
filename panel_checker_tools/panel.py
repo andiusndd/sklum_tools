@@ -9,6 +9,7 @@ class VIEW3D_PT_sklum_tools(Panel):
     bl_region_type = 'UI'
     bl_category = 'SKLUM Tools'
     bl_label = "SKLUM - Checker & Tools"
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
