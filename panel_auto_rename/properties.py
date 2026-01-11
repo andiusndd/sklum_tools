@@ -49,9 +49,34 @@ def get_material_items(self, context):
     return [(item, item, f"Material: {item}") for item in material_list]
 
 
+def get_mesh_name_items(self, context):
+    """Returns mesh name items filtered by selected model_type.
+    
+    This callback dynamically filters parts based on the furniture type
+    selected in model_type field.
+    """
+    # Get the current model_type from parent settings
+    settings = context.scene.sklum_auto_rename_settings
+    model_type = settings.model_type
+    
+    if model_type:
+        # Get parts for this specific model type
+        parts = utils.get_parts_for_model(model_type)
+    else:
+        # No model type selected, show default
+        parts = ['Part']
+    
+    # Return as enum items: (identifier, name, description)
+    return [(part, part, f"Part: {part}") for part in parts]
+
+
 class SKLUM_PG_AutoRenameItem(PropertyGroup):
     original_name: StringProperty()
-    mesh_name: StringProperty(name="Tên")
+    mesh_name: EnumProperty(
+        name="Tên",
+        items=get_mesh_name_items,
+        description="Select part name (filtered by model type)"
+    )
     material_name: EnumProperty(
         name="Tên VL",
         items=get_material_items,

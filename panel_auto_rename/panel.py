@@ -57,7 +57,7 @@ class VIEW3D_PT_sklum_auto_rename(Panel):
             item = settings.items[settings.active_index]
 
             item_box = box.box()
-            utils.draw_preset_input(item_box, item, "mesh_name", "mesh_names", "SKLUM_MT_mesh_name_presets")
+            item_box.prop(item, "mesh_name")
             item_box.prop(item, "material_name")
 
         layout.operator("sklum.auto_rename_execute", text="Đổi", icon='PLAY')

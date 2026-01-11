@@ -4,6 +4,15 @@ Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ 
 
 
 
+
+## [v2.6.9] - 2026-01-12
+### Added
+- **Auto Rename Panel**: Thêm dynamic part presets cho trường "Tên" (mesh_name).
+  - Dropdown "Tên" tự động lọc các parts dựa trên "Loại Model" đã chọn.
+  - Ví dụ: Chọn "Chair" → chỉ hiển thị "Seat, Leg"; chọn "Table" → chỉ hiển thị "Top, Leg".
+  - Dữ liệu parts được load từ file `model_parts.csv` (100 furniture types với parts tương ứng).
+  - Tích hợp tính năng search/filter trong dropdown.
+
 ## [v2.6.8] - 2026-01-12
 ### Added
 - **Auto Rename Panel**: Thêm 35 material presets cho trường "Tên VL".

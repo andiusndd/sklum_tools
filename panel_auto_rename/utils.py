@@ -92,6 +92,64 @@ def set_last_loaded_csv(filepath):
     _last_loaded_csv_filepath = filepath
 
 
+# --- Model Parts Cache Helpers ---
+
+_model_parts_cache = {}
+
+
+def get_model_parts_csv_path():
+    """Get path to model_parts.csv file."""
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), "model_parts.csv")
+
+
+def load_model_parts_csv():
+    """Load model parts mapping from CSV file."""
+    global _model_parts_cache
+    
+    csv_path = get_model_parts_csv_path()
+    if not os.path.exists(csv_path):
+        print(f"Warning: model_parts.csv not found at {csv_path}")
+        return False
+    
+    try:
+        _model_parts_cache.clear()
+        with open(csv_path, 'r', encoding='utf-8') as handle:
+            reader = csv.reader(handle)
+            next(reader)  # Skip header row
+            
+            for row in reader:
+                if len(row) >= 3:
+                    model_name = row[1].strip()  # Column: Đồ vật (Item)
+                    parts_str = row[2].strip()   # Column: Bộ phận chính (Parts)
+                    # Split parts by comma and clean whitespace
+                    parts = [part.strip() for part in parts_str.split(',')]
+                    _model_parts_cache[model_name] = parts
+        
+        print(f"Loaded {len(_model_parts_cache)} model parts from CSV")
+        return True
+    except Exception as exc:
+        print(f"Error loading model_parts.csv: {exc}")
+        _model_parts_cache.clear()
+        return False
+
+
+def get_parts_for_model(model_type):
+    """Get list of parts for a specific model type.
+    
+    Args:
+        model_type: Furniture type (e.g., 'Chair', 'Table')
+    
+    Returns:
+        List of part names, or ['Part'] if not found
+    """
+    # Load CSV if cache is empty
+    if not _model_parts_cache:
+        load_model_parts_csv()
+    
+    # Return parts for this model, or default if not found
+    return _model_parts_cache.get(model_type, ['Part'])
+
+
 # --- Preset Helpers ---
 
 def get_preset_path():
