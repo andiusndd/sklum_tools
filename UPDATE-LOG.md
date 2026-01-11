@@ -2,6 +2,13 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [v2.6.7] - 2026-01-11
+### Changed
+- **UI Object Setting**: Cải thiện giao diện, chuyển sang bố cục dọc thoáng hơn.
+  - Các nhóm chức năng (Rename, Select, Transform...) có tiêu đề riêng.
+  - Nút bấm được sắp xếp lại dạng Grid/Row, hiển thị rõ ràng hơn.
+- **Workflow**: Cập nhật quy trình Export hỗ trợ cấu trúc Legacy/Extensions Hybrid.
+
 ## [2.6.6] - 2026-01-11
 ### UI Overhaul
 - **panel_object_setting**: Thiết kế lại toàn bộ giao diện theo chuẩn "Pixel-Perfect Split Layout".

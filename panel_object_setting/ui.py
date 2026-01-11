@@ -30,13 +30,6 @@ class SKLUM_PT_ObjectSetting(Panel):
         # 3. Object Management
         self._draw_object_management_section(layout, context, settings)
 
-    def _draw_split_row(self, layout, label, icon, factor=0.4):
-        """Helper to draw consistent split row: Label (40%) | Buttons (60%)"""
-        split = layout.split(factor=factor, align=True)
-        col_label = split.column(align=True)
-        col_label.alignment = 'LEFT'
-        col_label.label(text=label, icon=icon)
-        return split.column(align=True)
 
     def _draw_overlay_section(self, layout, context):
         # Safe access to space_data properties
@@ -82,79 +75,85 @@ class SKLUM_PT_ObjectSetting(Panel):
         else:
             row.label(text="No active object", icon='INFO')
 
+    def _draw_vertical_group(self, layout, label, icon):
+        """Helper: Group Name (Row) -> Content (Row via grid/column)"""
+        col = layout.column(align=True)
+        col.label(text=label, icon=icon)
+        return col
+
     def _draw_object_management_section(self, layout, context, settings):
-        box = layout.box()
-        col = box.column(align=True)
-        col.label(text="Object", icon='MESH_DATA')
+        layout.separator()
+        layout.label(text="Object Management", icon='MESH_DATA')
         
-        # Rename
-        right = self._draw_split_row(col, "Rename", 'QUESTION')
-        row = right.row(align=True)
+        # 1. Rename
+        col = self._draw_vertical_group(layout, "Rename", 'QUESTION')
+        row = col.row(align=True)
         row.prop(settings, "rename_name", text="")
-        row.operator("sklum.object_rename", text="", icon='PLAY')
+        row.operator("sklum.object_rename", text="Rename", icon='PLAY')
 
-        # Select By Type
-        right = self._draw_split_row(col, "Select By Type", 'RESTRICT_SELECT_OFF')
-        row = right.row(align=True)
-        row.operator("sklum.select_by_type", text="", icon='MESH_ICOSPHERE').type_name = 'MESH'
-        row.operator("sklum.select_by_type", text="", icon='LIGHT').type_name = 'LIGHT'
-        row.operator("sklum.select_by_type", text="", icon='CAMERA_DATA').type_name = 'CAMERA'
-        row.operator("sklum.select_by_type", text="", icon='CURVE_DATA').type_name = 'CURVE'
-        row.operator("sklum.select_by_type", text="", icon='EMPTY_DATA').type_name = 'EMPTY'
-        row.operator("sklum.select_by_type", text="", icon='ARMATURE_DATA').type_name = 'ARMATURE'
-        row.operator("sklum.select_by_type", text="", icon='NODE').type_name = 'LATTICE' # Heuristic
-
-        # Apply Transform
-        right = self._draw_split_row(col, "Apply Transform", 'MODIFIER')
-        row = right.row(align=True)
+        # 2. Select By Type (Grid 3 cols)
+        col = self._draw_vertical_group(layout, "Select By Type", 'RESTRICT_SELECT_OFF')
+        grid = col.grid_flow(row_major=True, columns=3, even_columns=True, even_rows=True, align=True)
+        grid.operator("sklum.select_by_type", text="Mesh", icon='MESH_ICOSPHERE').type_name = 'MESH'
+        grid.operator("sklum.select_by_type", text="Light", icon='LIGHT').type_name = 'LIGHT'
+        grid.operator("sklum.select_by_type", text="Camera", icon='CAMERA_DATA').type_name = 'CAMERA'
+        grid.operator("sklum.select_by_type", text="Curve", icon='CURVE_DATA').type_name = 'CURVE'
+        grid.operator("sklum.select_by_type", text="Empty", icon='EMPTY_DATA').type_name = 'EMPTY'
+        grid.operator("sklum.select_by_type", text="Armature", icon='ARMATURE_DATA').type_name = 'ARMATURE'
+        
+        # 3. Apply Transform (Row)
+        col = self._draw_vertical_group(layout, "Apply Transform", 'MODIFIER')
+        row = col.row(align=True)
         row.operator("sklum.apply_transform", text="Scale").mode = 'SCALE'
         row.operator("sklum.apply_transform", text="Rotation").mode = 'ROTATION'
         row.operator("sklum.apply_transform", text="All").mode = 'ALL'
 
-        # Quick Origin
-        right = self._draw_split_row(col, "Quick Origin", 'ORIENTATION_CURSOR')
-        row = right.row(align=True)
+        # 4. Quick Origin (Row)
+        col = self._draw_vertical_group(layout, "Quick Origin", 'ORIENTATION_CURSOR')
+        row = col.row(align=True)
         row.operator("sklum.quick_origin", text="Bottom").type = 'BOTTOM'
         row.operator("sklum.quick_origin", text="Center").type = 'CENTER'
         row.operator("sklum.quick_origin", text="Head").type = 'HEAD'
 
-        # Custom Origin
-        right = self._draw_split_row(col, "Custom Origin", 'ORIENTATION_GIMBAL')
-        row = right.row(align=True)
+        # 5. Custom Origin (Row complex)
+        col = self._draw_vertical_group(layout, "Custom Origin", 'ORIENTATION_GIMBAL')
+        row = col.row(align=True)
         row.operator("sklum.quick_origin", text="Set").type = 'CUSTOM'
-        row.prop(settings, "origin_target_z", text="")
-        row.prop(settings, "origin_target_xy", text="")
-        row.prop(settings, "origin_target_mode", text="")
+        row.prop(settings, "origin_target_mode", text="") # Dropdown
+        
+        row = col.row(align=True)
+        row.prop(settings, "origin_target_z", text="Z Offset")
+        row.prop(settings, "origin_target_xy", text="XY Offset")
 
-        # Shading
-        right = self._draw_split_row(col, "Shading", 'SETTINGS')
-        row = right.row(align=True)
-        row.operator("sklum.shading_update", text="FlipN").action = 'FLIP'
-        row.operator("sklum.shading_update", text="AutoS").action = 'AUTOSMOOTH'
-        row.operator("sklum.shading_update", text="Mark").action = 'MARK_SHARP'
-        row.operator("sklum.shading_update", text="Clear").action = 'CLEAR_SHARP'
+        # 6. Shading (Grid 2 cols)
+        col = self._draw_vertical_group(layout, "Shading", 'SETTINGS')
+        grid = col.grid_flow(row_major=True, columns=2, even_columns=True, even_rows=True, align=True)
+        grid.operator("sklum.shading_update", text="Flip Normal").action = 'FLIP'
+        grid.operator("sklum.shading_update", text="Auto Smooth").action = 'AUTOSMOOTH'
+        grid.operator("sklum.shading_update", text="Mark Sharp").action = 'MARK_SHARP'
+        grid.operator("sklum.shading_update", text="Clear Sharp").action = 'CLEAR_SHARP'
 
-        # Materials
-        right = self._draw_split_row(col, "Materials", 'MATERIAL')
-        row = right.row(align=True)
+        # 7. Materials (Row)
+        col = self._draw_vertical_group(layout, "Materials", 'MATERIAL')
+        row = col.row(align=True)
         row.operator("sklum.material_action", text="Remove").action = 'REMOVE'
         row.operator("sklum.material_action", text="Display").action = 'DISPLAY'
         row.operator("sklum.material_action", text="Rename").action = 'RENAME'
 
-        # Set Location
-        right = self._draw_split_row(col, "Set Location", 'EMPTY_AXIS')
-        row = right.row(align=True)
+        # 8. Set Location
+        col = self._draw_vertical_group(layout, "Set Location", 'EMPTY_AXIS')
+        row = col.row(align=True)
         row.operator("sklum.set_location", text="Set")
         row.prop(settings, "location_axis", text="")
         row.prop(settings, "location_value", text="")
 
-        # Parent
-        right = self._draw_split_row(col, "Parent", 'ORIENTATION_PARENT')
-        row = right.row(align=True)
-        row.operator("sklum.parent_action", text="Set").action = 'SET'
-        row.operator("sklum.parent_action", text="Clear").action = 'CLEAR'
+        # 9. Parent
+        col = self._draw_vertical_group(layout, "Parent", 'ORIENTATION_PARENT')
+        row = col.row(align=True)
+        row.operator("sklum.parent_action", text="Set Parent").action = 'SET'
+        row.operator("sklum.parent_action", text="Clear Parent").action = 'CLEAR'
 
-        # Final Big Button
+        # 10. Final
         layout.separator()
         layout.operator("object.make_single_user", text="Make Single User", icon='QUESTION').type = 'ALL'
 
