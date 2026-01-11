@@ -27,16 +27,22 @@ Nếu user gửi `/release` thiếu tham số, hãy hỏi:
         - Chèn nội dung changelog vào đầu file `UPDATE-LOG.md`.
     - Sau đó xóa script helper.
 
-3.  **Kiểm tra chất lượng (Audit/Test)**:
+3.  **Đồng bộ Git**:
+    - Push phiên bản mới lên GitHub.
+    ```powershell
+    git add -A; git commit -m "Bump version to new release"; git push github_repo main
+    ```
+
+4.  **Kiểm tra chất lượng (Audit/Test)**:
     - Thực thi workflow `test.md`.
     - Chạy `python _test_addon.py`.
     - **CRITICAL**: Nếu bước này báo lỗi (Exit code 1), **DỪNG QUY TRÌNH NGAY**. Yêu cầu user sửa lỗi (gợi ý dùng `/fix`).
 
-4.  **Đóng gói (Export)**:
+5.  **Đóng gói (Export)**:
     - Nếu Audit OK, thực thi workflow `export.md`.
     - Chạy `python _export_addon.py`.
 
-5.  **Báo cáo**:
+6.  **Báo cáo**:
     - Thông báo version mới.
     - Đường dẫn file ZIP đã tạo.
 

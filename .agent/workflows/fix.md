@@ -51,7 +51,7 @@ PLAN: [Giải pháp đề xuất - optional]
 6.  **Hoàn thiện (Finalize)**:
     - **Giữ nguyên version** (không tăng version số) để tránh lạm phát version cho lỗi nhỏ.
     - Cập nhật dòng log của version hiện tại trong `UPDATE-LOG.md` (Update mục Fixed/Changed).
-    - `git commit -am "Fix: [mô tả ngắn]"`
+    - `git add -A; git commit -m "Fix: [mô tả ngắn]"; git push github_repo main`
 
 7.  **Tự động Export**:
     - **BẮT BUỘC** gọi script `_export_addon.py` để tạo bản vá ngay lập tức.

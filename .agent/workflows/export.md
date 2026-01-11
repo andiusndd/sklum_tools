@@ -10,7 +10,13 @@ Khi nhận được `/export` hoặc `@[/export]`, Agent sẽ thực hiện quy 
 
 // turbo-all
 
-0.  **Pre-flight Check**:
+1.  **Git Push**:
+    Đồng bộ mã nguồn trước khi đóng gói.
+    ```powershell
+    git add -A; git commit -m "Save state before export"; git push github_repo main
+    ```
+
+2.  **Pre-flight Check**:
     Khuyến nghị hoặc tự động chạy `/test` để đảm bảo code không có lỗi cú pháp trước khi đóng gói.
     `> Verifying codebase with /test...`
 
