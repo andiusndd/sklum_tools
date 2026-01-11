@@ -2,6 +2,13 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [v2.6.9] - 2026-01-11
+### Improved
+- **Custom Origin UI**: Cải thiện giao diện trực quan hơn.
+  - Thêm nhãn X, Y, Z cho từng hàng tùy chọn.
+  - Sử dụng button set thay cho dropdown để thao tác nhanh.
+  - Đổi tên các tùy chọn thành: Trái/Giữa/Phải, Trước/Giữa/Sau, Dưới/Giữa/Trên.
+
 ## [v2.6.8] - 2026-01-11
 ### Fixed
 - **Custom Origin**: Sửa lỗi thiếu tùy chọn và tính toán sai.

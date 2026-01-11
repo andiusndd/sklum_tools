@@ -117,9 +117,15 @@ Khi nhận được `/export` hoặc `@[/export]`, Agent sẽ thực hiện quy 
         export_addon()
     ```
 
-5.  **Dọn dẹp**: Xóa file `_export_addon.py` sau khi hoàn thành.
+5.  **Xác minh tồn tại (Verification)**:
+    Kiểm tra chắc chắn file ZIP đã được tạo thành công trước khi xóa script và thông báo.
+    ```powershell
+    Test-Path "SKLUMToolz_vX.X.X.zip"
+    ```
 
-6.  **Báo cáo kết quả**: Thông báo đường dẫn file ZIP.
+6.  **Dọn dẹp**: Xóa file `_export_addon.py` sau khi hoàn thành.
+
+7.  **Báo cáo kết quả**: Thông báo đường dẫn file ZIP.
 
 ## Ví dụ sử dụng
 

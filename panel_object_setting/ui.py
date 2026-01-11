@@ -119,13 +119,22 @@ class SKLUM_PT_ObjectSetting(Panel):
         col = self._draw_vertical_group(layout, "Custom Origin", 'ORIENTATION_GIMBAL')
         row = col.row(align=True)
         row.scale_y = 1.2
-        row.operator("sklum.quick_origin", text="Set Origin to Custom Alignment").type = 'CUSTOM'
+        row.operator("sklum.quick_origin", text="Set Origin to Custom Selection").type = 'CUSTOM'
         
-        # Grid for X Y Z
-        grid = col.grid_flow(row_major=True, columns=3, even_columns=True, even_rows=True, align=True)
-        grid.prop(settings, "origin_align_x", text="")
-        grid.prop(settings, "origin_align_y", text="")
-        grid.prop(settings, "origin_align_z", text="")
+        # X Axis Alignment
+        row = col.row(align=True)
+        row.label(text="X:")
+        row.prop(settings, "origin_align_x", expand=True)
+        
+        # Y Axis Alignment
+        row = col.row(align=True)
+        row.label(text="Y:")
+        row.prop(settings, "origin_align_y", expand=True)
+        
+        # Z Axis Alignment
+        row = col.row(align=True)
+        row.label(text="Z:")
+        row.prop(settings, "origin_align_z", expand=True)
 
         # 6. Shading (Grid 2 cols)
         col = self._draw_vertical_group(layout, "Shading", 'SETTINGS')

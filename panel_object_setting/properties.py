@@ -19,30 +19,31 @@ class SKLUM_PG_ObjectSettings(PropertyGroup):
 
     # Custom Origin
     # Custom Origin
+    # Custom Origin
     origin_align_x: EnumProperty(
         name="X Align",
         items=[
-            ('MIN', "Min (-)", "Align to Left/Min X"),
-            ('CENTER', "Center", "Align to Center X"),
-            ('MAX', "Max (+)", "Align to Right/Max X"),
+            ('MIN', "Trái", "Căn lề Trái (X-)"),
+            ('CENTER', "Giữa", "Căn lề Giữa (X)"),
+            ('MAX', "Phải", "Căn lề Phải (X+)"),
         ],
         default='CENTER'
     )
     origin_align_y: EnumProperty(
         name="Y Align",
         items=[
-            ('MIN', "Min (-)", "Align to Front/Min Y"),
-            ('CENTER', "Center", "Align to Center Y"),
-            ('MAX', "Max (+)", "Align to Back/Max Y"),
+            ('MAX', "Sau", "Căn lề Sau (Y+)"),
+            ('CENTER', "Giữa", "Căn lề Giữa (Y)"),
+            ('MIN', "Trước", "Căn lề Trước (Y-)"),
         ],
         default='CENTER'
     )
     origin_align_z: EnumProperty(
         name="Z Align",
         items=[
-            ('MIN', "Min (-)", "Align to Bottom/Min Z"),
-            ('CENTER', "Center", "Align to Center Z"),
-            ('MAX', "Max (+)", "Align to Top/Max Z"),
+            ('MIN', "Dưới", "Căn lề Dưới (Z-)"),
+            ('CENTER', "Giữa", "Căn lề Giữa (Z)"),
+            ('MAX', "Trên", "Căn lề Trên (Z+)"),
         ],
         default='MIN'
     )

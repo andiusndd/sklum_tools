@@ -17,3 +17,4 @@
     - Sử dụng `blender_manifest.toml` để quản lý metadata thay cho `bl_info` truyền thống.
     - Tuân thủ cấu trúc thư mục và quy chuẩn đóng gói của hệ thống Blender Extensions mới.
     - Cập nhật các thành phần API thay đổi trong phiên bản 4.2+ (ví dụ: EEVEE Next, các thay đổi trong Shader Nodes và GPU module).
+    - **Verification**: LUÔN kiểm tra sự tồn tại của file (ví dụ: `Test-Path` hoặc `os.path.exists`) trước khi thông báo cho user rằng file đã được tạo. Không bao giờ giả định thành công chỉ dựa trên output của script.
