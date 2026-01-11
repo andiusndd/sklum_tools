@@ -5,7 +5,7 @@ from bpy.types import Panel
 
 class SKLUM_PT_ObjectSetting(Panel):
     """Bảng cài đặt đối tượng tổng hợp"""
-    bl_label = "Object Setting"
+    bl_label = "SKLUM - Object Setting"
     bl_idname = "SKLUM_PT_object_setting"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -14,8 +14,13 @@ class SKLUM_PT_ObjectSetting(Panel):
     def draw(self, context):
         layout = self.layout
         settings = context.scene.sklum_object_settings
-        overlay = context.space_data.overlay
-        shading = context.space_data.shading
+        
+        # Safe access to space_data properties
+        space_data = context.space_data
+        is_3d_view = space_data and space_data.type == 'VIEW_3D'
+        
+        overlay = space_data.overlay if is_3d_view and hasattr(space_data, 'overlay') else None
+        shading = space_data.shading if is_3d_view and hasattr(space_data, 'shading') else None
 
         # --- Display Overlay ---
         box = layout.box()
@@ -23,18 +28,18 @@ class SKLUM_PT_ObjectSetting(Panel):
         row = col.row()
         row.label(text="Display Overlay", icon='RESTRICT_VIEW_OFF')
         
-        row = col.row(align=True)
-        row.prop(overlay, "show_face_orientation", text="Normal", icon='ORIENTATION_EXTERNAL') # Normal
-        row.prop(overlay, "show_wireframes", text="Wireframes", icon='WIRE')
-        row.prop(shading, "color_type", text="Random") # Text will handle random if mapped or just blank
-        # Note: 'Random' is a state of shading.color_type == 'RANDOM'
-        # To show it as a button like in the image, we might need a custom operator, 
-        # but let's try to match the look.
-        
-        row = col.row(align=True)
-        row.prop(shading, "light", text="Flat Color", icon='COLOR')
-        row.prop(overlay, "show_object_origins", text="Origins", icon='ORIENTATION_CURSOR')
-        row.prop(overlay, "show_overlays", text="render", icon='RENDERLAYERS')
+        if overlay and shading:
+            row = col.row(align=True)
+            row.prop(overlay, "show_face_orientation", text="Normal", icon='ORIENTATION_EXTERNAL')
+            row.prop(overlay, "show_wireframes", text="Wireframes", icon='WIRE')
+            row.prop(shading, "color_type", text="Random")
+            
+            row = col.row(align=True)
+            row.prop(shading, "light", text="Flat Color", icon='COLOR')
+            row.prop(overlay, "show_object_origins", text="Origins", icon='ORIENTATION_CURSOR')
+            row.prop(overlay, "show_overlays", text="render", icon='RENDERLAYERS')
+        else:
+            col.label(text="Display settings unavailable", icon='ERROR')
         
         # --- Object Display ---
         box = layout.box()

@@ -2,6 +2,11 @@
 
 Tất cả các thay đổi quan trọng đối với dự án SKLUM Tools sẽ được ghi lại trong file này.
 
+## [2.6.2] - 2026-01-11
+### Fixed
+- Đồng bộ tên panel thành `SKLUM - Object Setting` cho nhất quán với hệ thống.
+- Sửa lỗi UI crash khiến phần lớn các nút chức năng không hiển thị: Thêm cơ chế kiểm tra an toàn (safe access) khi truy cập thuộc tính Viewport.
+
 ## [2.6.1] - 2026-01-11
 ### Fixed
 - Bổ sung các nút chức năng còn thiếu trong module `panel_object_setting`:
