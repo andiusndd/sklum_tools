@@ -100,10 +100,12 @@ def check_for_update(repo_url):
         manifest_data = tomllib.loads(response.text)
         remote_version_str = manifest_data.get("version", "0.0.0")
         
-        # Get local version
-        from .. import bl_info
-        local_version = bl_info.get("version", (0, 0, 0))
-        local_version_str = f"{local_version[0]}.{local_version[1]}.{local_version[2]}"
+        # Get local version from manifest
+        addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        local_manifest_path = os.path.join(addon_dir, "blender_manifest.toml")
+        with open(local_manifest_path, "rb") as f:
+            local_manifest_data = tomllib.load(f)
+        local_version_str = local_manifest_data.get("version", "0.0.0")
         
         # Simple string comparison or tuple comparison if formatted correctly
         if remote_version_str != local_version_str:
