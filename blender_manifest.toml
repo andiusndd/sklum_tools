@@ -22,9 +22,13 @@ paths_exclude_pattern = [
     "server_backend/",
     "logs/",
     "__pycache__/",
+    "SKLUMToolz_temp/",
+    "SKLUM_temp/",
     "*.zip",
     "*.pyc",
-    "_export_addon.py"
+    "_export_addon.py",
+    "_workflow_export.py",
+    "_temp_export.py"
 ]
 
 [permissions]

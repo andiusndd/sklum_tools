@@ -75,10 +75,10 @@ Khi nhận được `/export` hoặc `@[/export]`, Agent sẽ thực hiện quy 
             rel_root = os.path.relpath(root, cwd)
             if rel_root == ".": rel_root = ""
             
-            # Prune excluded directories to speed up walk
+            # Prune excluded directories and the current temp_dir
             for d in list(dirs):
                 d_rel_path = os.path.normpath(os.path.join(rel_root, d))
-                if should_exclude(d_rel_path, exclude_patterns):
+                if d == temp_dir or should_exclude(d_rel_path, exclude_patterns):
                     dirs.remove(d)
 
             # Copy files
@@ -88,7 +88,7 @@ Khi nhận được `/export` hoặc `@[/export]`, Agent sẽ thực hiện quy 
                 # Manifest is ALWAYS included
                 if file == "blender_manifest.toml" and rel_root == "":
                     pass
-                elif should_exclude(f_rel_path, exclude_patterns):
+                elif file == zip_name or should_exclude(f_rel_path, exclude_patterns):
                     continue
 
                 target_dir = os.path.join(addon_dir, rel_root)
