@@ -101,12 +101,13 @@ def check_edge_sharp_crease(objects: List[bpy.types.Object]) -> CheckResult:
                     break
                     
     if not checked:
-        return CheckResult(False, "[LỖI] Edge Sharp/Crease: Chưa chọn vật nào để kiểm tra.")
+        return CheckResult(False, "Chưa chọn vật nào để kiểm tra.")
         
     if failed_objects:
-        return CheckResult(False, "[LỖI] Edge Sharp/Crease: Phát hiện cạnh mark sharp hoặc mean crease:\n" + "\n".join(errors), failed_objects)
+        # User specified this is not an error, so we return True (Pass)
+        return CheckResult(True, "Phát hiện cạnh mark sharp hoặc mean crease (Hợp lệ):\n" + "\n".join(errors), failed_objects)
         
-    return CheckResult(True, "[OK] Edge Sharp/Crease: Không có cạnh nào mark sharp hoặc mean crease.")
+    return CheckResult(True, "Không có cạnh nào mark sharp hoặc mean crease.")
 
 def check_vertex_groups(objects: List[bpy.types.Object]) -> CheckResult:
     """
