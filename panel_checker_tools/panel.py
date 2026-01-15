@@ -24,7 +24,7 @@ class VIEW3D_PT_sklum_tools(Panel):
             box.prop(scene, "sklum_license_key")
             
             row = box.row(align=True)
-            row.operator("sklum.activate_license", text="Kích Hoạt", icon='KEY_COMMON')
+            row.operator("sklum.activate_license", text="Kích Hoạt", icon='KEY_HLT')
             
             if scene.sklum_license_message:
                 box.label(text=scene.sklum_license_message, icon='INFO')
