@@ -121,6 +121,34 @@ class VIEW3D_PT_sklum_version_info(Panel):
         row2 = layout.row(align=True)
         # Using a small separator to give it some air if needed, otherwise just label
         row2.label(text=settings.status_message, icon='NONE')
+        
+        # Separator before License section
+        layout.separator()
+        
+        # LICENSE SECTION
+        scene = context.scene
+        license_box = layout.box()
+        
+        if not scene.sklum_license_active:
+            # Not activated - show activation form
+            license_box.alert = True
+            license_box.label(text="⚠️ CHƯA KÍCH HOẠT LICENSE", icon='LOCKED')
+            
+            license_box.prop(scene, "sklum_license_key", text="License Key")
+            
+            row = license_box.row(align=True)
+            row.operator("sklum.activate_license", text="Kích Hoạt", icon='KEY_HLT')
+            
+            if scene.sklum_license_message:
+                license_box.label(text=scene.sklum_license_message, icon='INFO')
+                
+            license_box.separator()
+            license_box.label(text="Vui lòng kích hoạt để sử dụng các công cụ.")
+        else:
+            # Activated - show status
+            row = license_box.row()
+            row.label(text="✅ License Active", icon='UNLOCKED')
+            row.operator("sklum.deactivate_license", text="", icon='X')
 
 
 classes = (

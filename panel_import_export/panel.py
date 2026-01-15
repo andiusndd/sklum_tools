@@ -11,6 +11,11 @@ class VIEW3D_PT_sklum_import_export(Panel):
     bl_label = "SKLUM - Import/Export"
     bl_options = {'DEFAULT_CLOSED'}
 
+    @classmethod
+    def poll(cls, context):
+        """Only show this panel if license is active"""
+        return context.scene.sklum_license_active
+
     def draw(self, context):
         layout = self.layout
         scene = context.scene

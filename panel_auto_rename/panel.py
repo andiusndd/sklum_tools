@@ -13,6 +13,11 @@ class VIEW3D_PT_sklum_auto_rename(Panel):
     bl_label = "SKLUM - Auto Rename"
     bl_options = {'DEFAULT_CLOSED'}
 
+    @classmethod
+    def poll(cls, context):
+        """Only show this panel if license is active"""
+        return context.scene.sklum_license_active
+
     def draw(self, context):
         layout = self.layout
         settings = context.scene.sklum_auto_rename_settings
