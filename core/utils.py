@@ -191,25 +191,50 @@ def download_and_install_update(repo_url):
                 
                 logger.info(f"Swapping directories...")
                 
-                # 2. Rename current to old
-                os.rename(addon_dir, old_dir)
+                # CRITICAL: Force close logger handlers to release locks on current folder
+                try:
+                    logger.shutdown()
+                except Exception as log_e:
+                    print(f"Update: Error shutting down logger: {log_e}")
+
+                # 2. Rename current to old (Retry loop)
+                renamed = False
+                for i in range(10):
+                    try:
+                        os.rename(addon_dir, old_dir)
+                        renamed = True
+                        break
+                    except OSError as e:
+                        # WinError 5 or 32
+                        time.sleep(0.5)
+                        # Try to gc collect to release handles?
+                        import gc
+                        gc.collect()
                 
+                if not renamed:
+                     # Re-init logger to report error if we failed
+                     # But shutdown killed instance? No, just handlers.
+                     # We can just return error.
+                     return False, f"Could not rename addon folder (Access Denied). Please restart Blender and try again."
+
                 try:
                     # 3. Move new directory to current path
                     shutil.move(source_dir, addon_dir)
-                    logger.info("Update files moved into place.")
                     
-                    # 4. Success! Try to cleanup the old dir (might still fail on Windows, but that's OK)
+                    # 4. Success! Try to cleanup the old dir
                     if safe_remove(old_dir):
-                        logger.info("Cleanup successful.")
+                        print("Update: Cleanup successful.")
                     else:
-                        logger.warning(f"Could not delete old version at {old_dir}. It will be orphaned but doesn't affect the update.")
+                        print(f"Update: Could not delete old version at {old_dir}. It will be cleaned up next time or manually.")
                         
                 except Exception as e:
                     # Rollback: Try to move old back to current if swap failed
-                    logger.error(f"Installation failed, attempting rollback: {e}")
+                    print(f"Installation failed, attempting rollback: {e}")
                     if os.path.exists(old_dir) and not os.path.exists(addon_dir):
-                        os.rename(old_dir, addon_dir)
+                        try:
+                            os.rename(old_dir, addon_dir)
+                        except:
+                            pass
                     raise e
                 
             return True, "Update installed successfully. Please restart Blender."
