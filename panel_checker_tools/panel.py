@@ -17,56 +17,78 @@ class VIEW3D_PT_sklum_tools(Panel):
 
         layout.operator("sklum.check_all", text="Check All / Refresh", icon='FILE_REFRESH')
 
+        # Prepare data for summary
+        legacy_lines = []
         if scene.sklum_check_all_result:
-            has_errors = any(
-                line.strip().startswith("[LỖI]")
-                for line in scene.sklum_check_all_result.split("\n")
-            )
+            legacy_lines = [line.strip() for line in scene.sklum_check_all_result.split("\n") if line.strip()]
+            
+        structured_items = scene.sklum_check_results_data
+        
+        has_errors_legacy = any(line.startswith("[LỖI]") for line in legacy_lines)
+        has_errors_structured = any(not item.status for item in structured_items)
+        has_errors = has_errors_legacy or has_errors_structured
 
-            header_box = layout.box()
-            if has_errors:
-                header_box.alert = True
-            header_row = header_box.row()
-            header_row.prop(
-                scene,
-                "sklum_check_all_collapsed",
-                icon="TRIA_DOWN" if not scene.sklum_check_all_collapsed else "TRIA_RIGHT",
-                icon_only=True,
-                emboss=False,
-            )
-            header_row.label(text="📊 KẾT QUẢ TỔNG HỢP", icon='VIEWZOOM')
+        # Draw Header
+        header_box = layout.box()
+        if has_errors:
+            header_box.alert = True
+        header_row = header_box.row()
+        header_row.prop(
+            scene,
+            "sklum_check_all_collapsed",
+            icon="TRIA_DOWN" if not scene.sklum_check_all_collapsed else "TRIA_RIGHT",
+            icon_only=True,
+            emboss=False,
+        )
+        header_row.label(text="📊 KẾT QUẢ TỔNG HỢP", icon='VIEWZOOM')
 
-            summary_box = layout.box()
-            if not scene.sklum_check_all_collapsed:
-                for line in scene.sklum_check_all_result.split("\n"):
-                    if not line.strip():
-                        continue
-                    sub_box = summary_box.box()
-                    if line.strip().startswith("[LỖI]"):
-                        sub_box.alert = True
-                        sub_box.label(text=line, icon='ERROR')
-                    elif line.strip().startswith("[OK]"):
-                        sub_box.alert = False
-                        sub_box.label(text=line, icon='CHECKMARK')
-                    else:
-                        sub_box.label(text=line)
-            else:
-                lines = [line.strip() for line in scene.sklum_check_all_result.split("\n") if line.strip()]
-                error_count = sum(line.startswith("[LỖI]") for line in lines)
-                ok_count = sum(line.startswith("[OK]") for line in lines)
-
-                if error_count > 0:
-                    error_box = summary_box.box()
-                    error_box.alert = True
-                    error_box.label(text=f"⚠️ {error_count} lỗi cần sửa", icon='ERROR')
-                    if ok_count > 0:
-                        ok_box = summary_box.box()
-                        ok_box.alert = False
-                        ok_box.label(text=f"✅ {ok_count} kiểm tra đạt chuẩn", icon='CHECKMARK')
+        summary_box = layout.box()
+        if not scene.sklum_check_all_collapsed:
+            # Draw Legacy Lines
+            for line in legacy_lines:
+                sub_box = summary_box.box()
+                if line.startswith("[LỖI]"):
+                    sub_box.alert = True
+                    sub_box.label(text=line, icon='ERROR')
+                elif line.startswith("[OK]"):
+                    sub_box.alert = False
+                    sub_box.label(text=line, icon='CHECKMARK')
                 else:
+                    sub_box.label(text=line)
+                    
+            # Draw Structured Items
+            for item in structured_items:
+                sub_box = summary_box.box()
+                if not item.status:
+                    sub_box.alert = True
+                    icon = 'ERROR'
+                    msg = f"⚠️ {item.label}: {item.message}"
+                else:
+                    sub_box.alert = False
+                    icon = 'CHECKMARK'
+                    msg = f"✅ {item.label}: {item.message}"
+                sub_box.label(text=msg, icon=icon)
+                
+        else:
+            # Collapsed View
+            error_count = sum(line.startswith("[LỖI]") for line in legacy_lines)
+            error_count += sum(1 for item in structured_items if not item.status)
+            
+            ok_count = sum(line.startswith("[OK]") for line in legacy_lines)
+            ok_count += sum(1 for item in structured_items if item.status)
+
+            if error_count > 0:
+                error_box = summary_box.box()
+                error_box.alert = True
+                error_box.label(text=f"⚠️ {error_count} lỗi cần sửa", icon='ERROR')
+                if ok_count > 0:
                     ok_box = summary_box.box()
                     ok_box.alert = False
-                    ok_box.label(text=f"✅ Tất cả {ok_count} kiểm tra đều đạt chuẩn", icon='CHECKMARK')
+                    ok_box.label(text=f"✅ {ok_count} kiểm tra đạt chuẩn", icon='CHECKMARK')
+            else:
+                ok_box = summary_box.box()
+                ok_box.alert = False
+                ok_box.label(text=f"✅ Tất cả {ok_count} kiểm tra đều đạt chuẩn", icon='CHECKMARK')
 
         layout.separator()
 

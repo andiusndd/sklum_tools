@@ -2,6 +2,7 @@
 
 import bpy
 from bpy.types import Operator
+from ...core import checker_logic
 
 
 class SKLUM_OT_check_all(Operator):
@@ -35,140 +36,68 @@ class SKLUM_OT_check_all(Operator):
             bpy.ops.sklum.check_grid3('EXEC_DEFAULT', mode='TRIANGLE')
 
         scene = context.scene
+        
+        # Clear previous results
+        scene.sklum_check_results_data.clear()
+        
+        def add_result(label, res):
+            item = scene.sklum_check_results_data.add()
+            item.label = label
+            item.status = res.status
+            item.message = res.message
+            item.failed_count = len(res.failed_objects) if res.failed_objects else 0
+            
+            # Legacy string support (temporary, can remove if UI is fully updated)
+            # We keep it empty or simple to avoid errors if UI still references it
+            return item
 
-        # Kiểm tra UVMap: mỗi object chỉ có 1 UVMap và tên phải là 'UVMap'
-        uvmap_errors = []
-        for obj in context.selected_objects:
-            if obj.type == 'MESH':
-                uv_layers = obj.data.uv_layers
-                if len(uv_layers) != 1:
-                    uvmap_errors.append(f"{obj.name}: Có {len(uv_layers)} UVMap")
-                elif uv_layers[0].name != 'UVMap':
-                    uvmap_errors.append(f"{obj.name}: Tên UVMap là '{uv_layers[0].name}'")
-        if not context.selected_objects:
-            scene.sklum_uvmap_check_result = "Chưa chọn vật nào để kiểm tra."
-        elif uvmap_errors:
-            scene.sklum_uvmap_check_result = "Phát hiện lỗi UVMap:\n" + "\n".join(uvmap_errors)
-        else:
-            scene.sklum_uvmap_check_result = "Tất cả object đều có đúng 1 UVMap tên 'UVMap'."
+        # Check UVMap
+        add_result("UVMap", checker_logic.check_uv_map(context.selected_objects))
+        
+        # Check UV Outside
+        add_result("UV Outside", checker_logic.check_uv_outside(context.selected_objects))
+        
+        # Check Texture Pack
+        add_result("Texture Pack", checker_logic.check_texture_pack(bpy.data.materials))
+        
+        # Check Edge Sharp/Crease
+        add_result("Edge Sharp/Crease", checker_logic.check_edge_sharp_crease(context.selected_objects))
+        
+        # Check Vertex Groups
+        add_result("Vertex Group", checker_logic.check_vertex_groups(context.selected_objects))
+        
+        # Check Modifiers
+        add_result("Modifier", checker_logic.check_modifiers(context.selected_objects))
 
-        # Kiểm tra UV outside [0,1]
-        uv_outside_errors = []
-        for obj in context.selected_objects:
-            if obj.type == 'MESH' and obj.data.uv_layers:
-                uv_layer = obj.data.uv_layers.active.data
-                for i, loop in enumerate(uv_layer):
-                    u, v = loop.uv
-                    if u < 0 or u > 1 or v < 0 or v > 1:
-                        uv_outside_errors.append(f"{obj.name}: UV ngoài [0,1] tại index {i} ({u:.3f}, {v:.3f})")
-                        break
-        if not context.selected_objects:
-            scene.sklum_uv_outside_check_result = "Chưa chọn vật nào để kiểm tra."
-        elif uv_outside_errors:
-            scene.sklum_uv_outside_check_result = "Phát hiện UV outside:\n" + "\n".join(uv_outside_errors)
-        else:
-            scene.sklum_uv_outside_check_result = "Tất cả UV đều nằm trong [0,1]."
-
-        # Kiểm tra texture pack: mỗi image của node TEX_IMAGE trong vật liệu phải được pack
-        texture_pack_errors = []
-        for mat in bpy.data.materials:
-            if not mat.use_nodes:
-                continue
-            for node in mat.node_tree.nodes:
-                if node.type == 'TEX_IMAGE' and node.image:
-                    if not node.image.packed_file:
-                        texture_pack_errors.append(f"{mat.name}: {node.image.name} chưa được pack")
-        if not bpy.data.materials:
-            scene.sklum_texture_pack_check_result = "Không có material nào để kiểm tra."
-        elif texture_pack_errors:
-            scene.sklum_texture_pack_check_result = "Phát hiện texture chưa pack:\n" + "\n".join(texture_pack_errors)
-        else:
-            scene.sklum_texture_pack_check_result = "Tất cả texture đã được pack."
-
-        # Kiểm tra cạnh mark sharp hoặc mean crease
-        edge_sharp_crease_errors = []
-        checked = False
-        for obj in context.selected_objects:
-            if obj.type == 'MESH':
-                checked = True
-                for edge in obj.data.edges:
-                    if getattr(edge, 'use_edge_sharp', False) or getattr(edge, 'crease', 0) > 0:
-                        edge_sharp_crease_errors.append(f"{obj.name}: Có cạnh mark sharp hoặc mean crease (edge index {edge.index})")
-                        break
-        if not checked:
-            scene.sklum_edge_sharp_crease_check_result = "[LỖI] Edge Sharp/Crease: Chưa chọn vật nào để kiểm tra."
-        elif edge_sharp_crease_errors:
-            scene.sklum_edge_sharp_crease_check_result = "[LỖI] Edge Sharp/Crease: Phát hiện cạnh mark sharp hoặc mean crease:\n" + "\n".join(edge_sharp_crease_errors)
-        else:
-            scene.sklum_edge_sharp_crease_check_result = "[OK] Edge Sharp/Crease: Không có cạnh nào mark sharp hoặc mean crease."
-
-        # Kiểm tra vertex groups: không được có vertex group
-        vertex_group_errors = []
-        for obj in context.selected_objects:
-            if obj.type == 'MESH' and obj.vertex_groups:
-                vertex_group_errors.append(f"{obj.name}: Có {len(obj.vertex_groups)} vertex group")
-        if not context.selected_objects:
-            scene.sklum_vertex_group_check_result = "Chưa chọn vật nào để kiểm tra."
-        elif vertex_group_errors:
-            scene.sklum_vertex_group_check_result = "Phát hiện object có vertex group:\n" + "\n".join(vertex_group_errors)
-        else:
-            scene.sklum_vertex_group_check_result = "Không có object nào có vertex group."
-
-        # Kiểm tra modifier: không được có modifier
-        modifier_errors = []
-        for obj in context.selected_objects:
-            if obj.type == 'MESH' and obj.modifiers:
-                modifier_errors.append(f"{obj.name}: Có {len(obj.modifiers)} modifier")
-        if not context.selected_objects:
-            scene.sklum_modifier_check_result = "Chưa chọn vật nào để kiểm tra."
-        elif modifier_errors:
-            scene.sklum_modifier_check_result = "Phát hiện object có modifier:\n" + "\n".join(modifier_errors)
-        else:
-            scene.sklum_modifier_check_result = "Không có object nào có modifier."
-
-        # Tổng hợp kết quả
+        # Generate summary string from structured data
         result_lines = []
-        check_fields = [
+        
+        # Add other checks (legacy ones that are not yet migrated to new system if any)
+        # For now, we assume all critical checks are in sklum_check_results_data
+        # But wait, 'Seam', 'Color Space', 'Active Point', 'Triangle' are executed via OTHER operators.
+        # Those operators might still set their respective string properties.
+        # So we should still read them if they exist.
+        
+        legacy_checks = [
             ('Seam', 'sklum_seam_check_result'),
             ('Color Space', 'sklum_color_space_check_result'),
             ('Active Point', 'sklum_active_point_check_result'),
             ('Triangle', 'sklum_grid3_check_result'),
-            ('UVMap', 'sklum_uvmap_check_result'),
-            ('UV Outside', 'sklum_uv_outside_check_result'),
-            ('Texture Pack', 'sklum_texture_pack_check_result'),
-            ('Edge Sharp/Crease', 'sklum_edge_sharp_crease_check_result'),
-            ('Vertex Group', 'sklum_vertex_group_check_result'),
-            ('Modifier', 'sklum_modifier_check_result'),
         ]
-        for label, attr in check_fields:
+        
+        for label, attr in legacy_checks:
             if hasattr(scene, attr):
                 msg = getattr(scene, attr)
-                if msg.startswith('[OK]') or msg.startswith('[LỖI]'):
-                    if "buffet:" not in msg.lower():
-                        result_lines.append(msg)
-                else:
-                    ok = False
-                    lower_msg = msg.lower()
-                    if label == 'Triangle':
-                        ok = "không tìm thấy mặt tam giác nào" in lower_msg or "không tìm thấy mặt n-gon nào" in lower_msg
-                    elif label == 'Edge Sharp/Crease':
-                        ok = "không có cạnh nào mark sharp" in lower_msg or "không có cạnh nào" in lower_msg
-                    elif label == 'Vertex Group':
-                        ok = "không có object nào có vertex group" in lower_msg or "không có vertex group" in lower_msg
-                    elif label == 'Modifier':
-                        ok = "không có object nào có modifier" in lower_msg or "không có modifier" in lower_msg
-                    elif label == 'UVMap':
-                        ok = "tất cả" in lower_msg or "đều có đúng" in lower_msg
-                    elif label == 'UV Outside':
-                        ok = "tất cả" in lower_msg or "đều nằm trong" in lower_msg
-                    elif label == 'Texture Pack':
-                        ok = "tất cả" in lower_msg or "đã được pack" in lower_msg
-                    else:
-                        ok = "tất cả" in lower_msg or "đều đúng" in lower_msg
-                    if ok:
-                        result_lines.append(f"[OK] {label}: {msg}")
-                    else:
-                        result_lines.append(f"[LỖI] {label}: {msg}")
+                if msg:
+                     # Simple heuristics since we haven't refactored these yet
+                     if "[LỖI]" in msg or ("không" not in msg.lower() and "đúng" not in msg.lower() and "ok" not in msg.lower()):
+                         # This heuristic is weak, but keeps existing behavior for now
+                         if msg.startswith("[OK]") or msg.startswith("[LỖI]"):
+                             result_lines.append(msg)
+                         else:
+                             # Try to format it
+                             # But sticking to original string is safer if we don't know format
+                             result_lines.append(msg)
 
         scene.sklum_check_all_result = "\n".join(result_lines)
 

@@ -55,8 +55,9 @@ EXPECTED_RESULT: [Kết quả mong đợi sau khi sửa]
     - Kiểm tra chức năng được sửa hoạt động đúng như mong đợi.
 
 6.  **Cập nhật tài liệu**:
-    - Cập nhật phiên bản trong `__init__.py` (biến `version` trong `bl_info`).
-    - Cập nhật phiên bản trong `core/constants.py` (biến `ADDON_VERSION`).
+    - **Quan trọng**: Cập nhật version trong `blender_manifest.toml`.
+    - Cập nhật version trong `__init__.py` (biến `version` trong `bl_info`).
+    - Cập nhật version trong `core/constants.py` (biến `ADDON_VERSION`).
     - Ghi lại thay đổi vào `UPDATE-LOG.md` theo format: `## [vX.X.X] - YYYY-MM-DD`.
 
 7.  **Tự học (Self-Learning)**: Nếu lỗi xảy ra do một pattern xấu trong code, hãy tạo hoặc cập nhật rule trong `.gemini/rules/` để phòng tránh lỗi tương tự.
