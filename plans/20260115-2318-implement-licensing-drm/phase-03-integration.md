@@ -15,5 +15,5 @@ With Client and Server ready, we need to secure the Client code so users cannot 
     -   Verify it FAILS on Machine B (simulated by changing HWID mock).
 
 ## Todo List
-- [ ] Update `_export_addon.py` to support PyArmor.
-- [ ] Document the "Reset License" process for the admin.
+- [x] Update `_export_addon.py` to support PyArmor.
+- [x] Document the "Reset License" process for the admin.

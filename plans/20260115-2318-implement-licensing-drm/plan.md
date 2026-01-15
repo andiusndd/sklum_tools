@@ -16,6 +16,6 @@ This plan uses a **Client-Server** architecture (Serverless) to minimize costs (
 - **Phase 3**: Integration & Security Hardening (Obfuscation).
 
 ## Status
-- [ ] Phase 1: Client-Side Logic
-- [ ] Phase 2: Backend API & Database
-- [ ] Phase 3: Integration & Obfuscation
+- [x] Phase 1: Client-Side Logic
+- [x] Phase 2: Backend API & Database
+- [x] Phase 3: Integration & Obfuscation

@@ -28,6 +28,6 @@ A server is required to store the valid keys and the HWIDs they are locked to. W
     -   Instruct user to create Supabase project and get URL/KEY.
 
 ## Todo List
-- [ ] Create `server_backend/api/index.py` skeleton.
-- [ ] Defined Database Schema (SQL).
-- [ ] Write `requirements.txt` for Vercel.
+- [x] Create `server_backend/api/index.py` skeleton.
+- [x] Defined Database Schema (SQL).
+- [x] Write `requirements.txt` for Vercel.

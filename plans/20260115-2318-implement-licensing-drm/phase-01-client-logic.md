@@ -20,7 +20,7 @@ We need the Addon to be able to identify the computer it is running on uniquely 
     -   Block key operators (like Auto-Rename or Check) if `is_active` is False.
 
 ## Todo List
-- [ ] Implement `get_machine_id` in `core/utils.py` or new `core/license.py`.
-- [ ] Create `SKLUM_OT_activate_license` operator.
-- [ ] Add License Key field to Addon Preferences.
-- [ ] Add "Gatekeeper" check to `sklum.check_all`.
+- [x] Implement `get_machine_id` in `core/utils.py` or new `core/license.py`.
+- [x] Create `SKLUM_OT_activate_license` operator.
+- [x] Add License Key field to Addon Preferences.
+- [x] Add "Gatekeeper" check to `sklum.check_all`.
