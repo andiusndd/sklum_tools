@@ -2,6 +2,9 @@ import subprocess
 import requests
 import sys
 
+# Replace this with your actual Vercel URL
+API_URL = "https://sklum-license-backend.vercel.app/api/index"
+
 def get_machine_id():
     """Gets a unique ID for the machine (Windows UUID)."""
     try:
@@ -17,18 +20,35 @@ def get_machine_id():
 def validate_license(key):
     """
     Validates the license key against the server.
-    MOCKED FOR PHASE 1: Returns True if key > 5 chars.
     """
     if not key:
         return False, "Vui lòng nhập License Key."
-        
-    # Mock validation
-    # Real logic: POST to https://my-vercel-api.com/api/activate
-    # with json={'key': key, 'hwid': get_machine_id()}
     
-    if len(key) > 5:
-        # Mocking success
-        # In real world, logic is here.
-        return True, "Kích hoạt thành công (Mock)."
-    else:
-        return False, "Key không hợp lệ (Mock > 5 chars)."
+    hwid = get_machine_id()
+    payload = {
+        'key': key.strip(),
+        'hwid': hwid
+    }
+    
+    try:
+        response = requests.post(API_URL, json=payload, timeout=10)
+        
+        # Check HTTP Status Code
+        if response.status_code == 200:
+            data = response.json()
+            return True, data.get('message', "License Valid")
+        else:
+            # 403, 404, 500
+            try:
+                data = response.json()
+                msg = data.get('message', f"Error {response.status_code}")
+                return False, msg
+            except:
+                return False, f"Server Error {response.status_code}"
+                
+    except requests.exceptions.Timeout:
+        return False, "Hết thời gian kết nối (Timeout). Vui lòng kiểm tra mạng."
+    except requests.exceptions.ConnectionError:
+        return False, "Không thể kết nối đến Server. Vui lòng kiểm tra mạng."
+    except Exception as e:
+        return False, f"Lỗi không xác định: {str(e)}"
