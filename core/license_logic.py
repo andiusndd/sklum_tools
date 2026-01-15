@@ -7,15 +7,34 @@ API_URL = "https://sklum-license-backend.vercel.app/api/index"
 
 def get_machine_id():
     """Gets a unique ID for the machine (Windows UUID)."""
+    # Method 1: WMIC (Standard)
     try:
-        # standard windows command to get motherboard uuid
         cmd = "wmic csproduct get uuid"
-        uuid = subprocess.check_output(cmd, shell=True).decode().split('\n')[1].strip()
-        if not uuid:
-            return "UNKNOWN_HWID"
-        return uuid
+        output = subprocess.check_output(cmd, shell=True).decode()
+        # Parse output carefully
+        lines = [line.strip() for line in output.split('\n') if line.strip()]
+        if len(lines) > 1:
+            return lines[1]
     except:
-        return "UNKNOWN_HWID_ERROR"
+        pass
+
+    # Method 2: PowerShell (Modern Windows)
+    try:
+        cmd = 'powershell "Get-CimInstance -Class Win32_ComputerSystemProduct | Select-Object -ExpandProperty UUID"'
+        uuid = subprocess.check_output(cmd, shell=True).decode().strip()
+        if uuid:
+            return uuid
+    except:
+        pass
+        
+    # Method 3: MAC Address (Fallback)
+    try:
+        import uuid
+        return str(uuid.getnode())
+    except:
+        pass
+
+    return "UNKNOWN_HWID_ERROR"
 
 def validate_license(key):
     """
