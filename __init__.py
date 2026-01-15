@@ -13,7 +13,6 @@ from bpy.app.handlers import persistent
 from .core.license_logic import validate_license
 
 from . import core
-from . import preferences  # New
 from . import panel_checker_tools
 from . import panel_import_export
 from . import panel_jpg_converter
@@ -24,7 +23,6 @@ from . import panel_version_info
 
 modules = [
     core,
-    preferences,  # New
     panel_checker_tools,
     panel_import_export,
     panel_jpg_converter,
