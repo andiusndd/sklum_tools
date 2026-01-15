@@ -90,6 +90,14 @@ def sync_init_file(major, minor, patch):
     new_content = re.sub(r'"version":\s*\(\d+,\s*\d+,\s*\d+\)', new_tuple, content)
     with open(INIT_FILE, 'w', encoding='utf-8') as f: f.write(new_content)
 
+def sync_constants_file(major, minor, patch):
+    path = "core/constants.py"
+    if not os.path.exists(path): return
+    with open(path, 'r', encoding='utf-8') as f: content = f.read()
+    new_tuple = f'ADDON_VERSION = ({major}, {minor}, {patch})'
+    new_content = re.sub(r'ADDON_VERSION\s*=\s*\(\d+,\s*\d+,\s*\d+\)', new_tuple, content)
+    with open(path, 'w', encoding='utf-8') as f: f.write(new_content)
+
 def update_log(version_str, changelog):
     log_path = "UPDATE-LOG.md"
     today = datetime.now().strftime("%Y-%m-%d")
@@ -98,11 +106,9 @@ def update_log(version_str, changelog):
     
     try:
          with open(log_path, 'r', encoding='utf-8') as f: lines = f.readlines()
-         # Insert after header or at suitable position (e.g., line 4)
+         # Insert after header or (e.g. line 4)
          insert_idx = 0
-         for i, line in enumerate(lines):
-             if line.strip() == "": insert_idx = i + 1; break
-         if insert_idx == 0 and len(lines) > 2: insert_idx = 4
+         if len(lines) > 2: insert_idx = 4 # Simple heuristic
          
          lines.insert(insert_idx, entry)
          with open(log_path, 'w', encoding='utf-8') as f: f.writelines(lines)
@@ -113,6 +119,7 @@ if __name__ == "__main__":
     notes = sys.argv[2]
     maj, min, pat = update_manifest_version(v_type)
     sync_init_file(maj, min, pat)
+    sync_constants_file(maj, min, pat)
     update_log(f"{maj}.{min}.{pat}", notes)
     print(f"✅ Released v{maj}.{min}.{pat}")
 ```
