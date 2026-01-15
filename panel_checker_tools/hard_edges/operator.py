@@ -28,7 +28,7 @@ class SKLUM_OT_select_hard_edges(Operator):
         mesh = obj.data
         bm = bmesh.from_edit_mesh(mesh)
 
-        angle_limit = context.scene.sklum_sharpness_angle
+        angle_limit = context.scene.sklum.sharpness_angle
 
         bm.edges.ensure_lookup_table()
         for edge in bm.edges:

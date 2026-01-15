@@ -70,8 +70,9 @@ class SKLUM_OT_check_color_space(Operator):
 
     def execute(self, context):
         scene = context.scene
+        sklum = scene.sklum
         scene.sklum_color_space_list.clear()
-        scene.sklum_color_space_needs_fix = False
+        sklum.color_space_needs_fix = False
 
         for mat in bpy.data.materials:
             if not mat.use_nodes:
@@ -92,14 +93,14 @@ class SKLUM_OT_check_color_space(Operator):
                 item.mat_name = mat.name
 
                 if node.image.colorspace_settings.name != expected_space:
-                    scene.sklum_color_space_needs_fix = True
+                    sklum.color_space_needs_fix = True
 
         if not any(mat.use_nodes for mat in bpy.data.materials):
-            scene.sklum_color_space_check_result = "Không có material nào để kiểm tra."
-        elif scene.sklum_color_space_needs_fix:
-            scene.sklum_color_space_check_result = "Phát hiện lỗi Color Space!"
+            sklum.color_space_check_result = "Không có material nào để kiểm tra."
+        elif sklum.color_space_needs_fix:
+            sklum.color_space_check_result = "Phát hiện lỗi Color Space!"
         else:
-            scene.sklum_color_space_check_result = "Tất cả Color Space đều đúng tiêu chuẩn."
+            sklum.color_space_check_result = "Tất cả Color Space đều đúng tiêu chuẩn."
 
         return {'FINISHED'}
 
@@ -125,7 +126,7 @@ class SKLUM_OT_fix_color_space(Operator):
                     fixed_count += 1
 
         self.report({'INFO'}, f"Đã sửa {fixed_count} node không đúng tiêu chuẩn.")
-        context.scene.sklum_color_space_needs_fix = False
+        context.scene.sklum.color_space_needs_fix = False
         bpy.ops.sklum.check_color_space('EXEC_DEFAULT')
         return {'FINISHED'}
 
@@ -187,7 +188,9 @@ def register():
 
 
 def unregister():
-    del bpy.types.Scene.sklum_color_space_list
-    del bpy.types.Scene.sklum_color_space_index
+    if hasattr(bpy.types.Scene, 'sklum_color_space_list'):
+        del bpy.types.Scene.sklum_color_space_list
+    if hasattr(bpy.types.Scene, 'sklum_color_space_index'):
+        del bpy.types.Scene.sklum_color_space_index
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

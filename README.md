@@ -15,23 +15,21 @@ Please refer to the detailed documentation in the `docs/` folder:
 - [🧩 Codebase Summary](docs/codebase-summary.md)
 - [🏗️ System Architecture](docs/system-architecture.md)
 - [📏 Code Standards](docs/code-standards.md)
-- [📁 Project Structure](STRUCTURE.md) (Legacy)
 
 ---
 
 ## 🚀 Key Features
-*   **Check All:** Comprehensive QA for UVs, Seams/Sharps, Color Space, Modifiers, and Vertex Groups with structured reporting.
-*   **License System:** Secure device-locking DRM to protect IP.
+*   **Check All:** Comprehensive QA for UVs, Seams/Sharps, Color Space, Modifiers, and Vertex Groups with real-time progress bars and structured reporting.
+*   **License System:** Non-blocking background hardware ID (HWID) validation with 24-hour persistence for seamless workflows.
 *   **Auto Rename:** Batch rename Objects/Materials/Textures via CSV rules (IDP) with powerful Preset support.
+*   **Robust Updates:** Atomic "Rename-Swap" update mechanism designed to bypass Windows file locks (`WinError 32`).
+*   **Centralized Logging:** Unified logging to both the Blender System Console and a persistent disk file for easier support.
 *   **Checker Tools:**
     *   **Color Space:** Auto-fix Texture Color Space (sRGB/Non-Color).
     *   **Active Point:** Origin normalization & Quick Group-to-Empty.
     *   **Grid Checker:** Detect unwanted Triangles/N-gons.
-*   **Import/Export:** 
-    *   Optimized FBX/GLB export.
-    *   Draco Compression & Texture format customization.
-    *   Pack/Unpack & Data Purge tools.
-*   **JPG Converter:** Batch convert PNG textures to JPG (Requires Pillow).
+*   **Import/Export:** Optimized FBX/GLB export with compression and texture customization.
+*   **JPG Converter:** Batch convert PNG textures to JPG.
 
 ## 📥 Installation
 1.  Download the `.zip` file from Releases.
@@ -41,9 +39,9 @@ Please refer to the detailed documentation in the `docs/` folder:
 
 ## 🛠️ Development
 See [Codebase Summary](docs/codebase-summary.md) for architecture details.
-- **`core/`**: Shared logic, DRM, and global properties.
-- **`panel_*/`**: Modular UI panels for specific feature groups.
-- **`server_backend/`**: Vercel/Supabase backend code (not included in Addon zip).
+- **`core/`**: Shared logic, Logging, DRM, and global properties.
+- **`panel_*/`**: Modular UI panels for specific feature groups (Lazy loaded).
+- **`server_backend/`**: Vercel/Supabase backend code for license validation.
 
 ## 📜 Update Log
-See detailed changes in [update-log.md](update-log.md).
+See detailed changes in [UPDATE-LOG.md](UPDATE-LOG.md).

@@ -1,9 +1,17 @@
-from . import panel
+import importlib
 
 def register():
-    if hasattr(panel, "register"):
-        panel.register()
+    try:
+        module = importlib.import_module(".panel", __package__)
+        if hasattr(module, "register"):
+            module.register()
+    except Exception as e:
+        print(f"[SKLUM] [VersionInfo] Error registering panel: {e}")
 
 def unregister():
-    if hasattr(panel, "unregister"):
-        panel.unregister()
+    try:
+        module = importlib.import_module(".panel", __package__)
+        if hasattr(module, "unregister"):
+            module.unregister()
+    except Exception as e:
+        print(f"[SKLUM] [VersionInfo] Error unregistering panel: {e}")

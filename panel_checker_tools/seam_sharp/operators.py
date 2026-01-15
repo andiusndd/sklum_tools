@@ -38,8 +38,9 @@ class SKLUM_OT_check_seam(Operator):
 
     def execute(self, context):
         scene = context.scene
+        sklum = scene.sklum
         scene.sklum_seam_list.clear()
-        scene.sklum_seam_needs_mark = False
+        sklum.seam_needs_mark = False
 
         for obj in context.selected_objects:
             if obj.type != 'MESH':
@@ -51,14 +52,14 @@ class SKLUM_OT_check_seam(Operator):
             item.has_seam = has_seam
 
             if not has_seam:
-                scene.sklum_seam_needs_mark = True
+                sklum.seam_needs_mark = True
 
         if not context.selected_objects:
-            scene.sklum_seam_check_result = "Chưa chọn vật nào để kiểm tra."
-        elif scene.sklum_seam_needs_mark:
-            scene.sklum_seam_check_result = "Phát hiện vật chưa có Seam!"
+            sklum.seam_check_result = "Chưa chọn vật nào để kiểm tra."
+        elif sklum.seam_needs_mark:
+            sklum.seam_check_result = "Phát hiện vật chưa có Seam!"
         else:
-            scene.sklum_seam_check_result = "Tất cả vật được chọn đều đã có Seam."
+            sklum.seam_check_result = "Tất cả vật được chọn đều đã có Seam."
 
         return {'FINISHED'}
 
@@ -112,7 +113,7 @@ class SKLUM_OT_mark_seam_from_uv(Operator):
         else:
             self.report({'WARNING'}, "Không có vật nào được xử lý.")
 
-        context.scene.sklum_seam_needs_mark = False
+        context.scene.sklum.seam_needs_mark = False
         bpy.ops.sklum.check_seam('EXEC_DEFAULT')
         return {'FINISHED'}
 
@@ -219,7 +220,9 @@ def register():
 
 
 def unregister():
-    del bpy.types.Scene.sklum_seam_list
-    del bpy.types.Scene.sklum_seam_index
+    if hasattr(bpy.types.Scene, 'sklum_seam_list'):
+        del bpy.types.Scene.sklum_seam_list
+    if hasattr(bpy.types.Scene, 'sklum_seam_index'):
+        del bpy.types.Scene.sklum_seam_index
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

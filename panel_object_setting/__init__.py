@@ -1,15 +1,27 @@
 """Panel: SKLUM - Object Setting"""
 
-from . import properties
-from . import operators
-from . import ui
+import importlib
 
-modules = [properties, operators, ui]
+submodules = [
+    'properties',
+    'operators',
+    'ui',
+]
 
 def register():
-    for module in modules:
-        module.register()
+    for name in submodules:
+        try:
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'register'):
+                module.register()
+        except Exception as e:
+            print(f"[SKLUM] [ObjectSetting] Error registering {name}: {e}")
 
 def unregister():
-    for module in reversed(modules):
-        module.unregister()
+    for name in reversed(submodules):
+        try:
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'unregister'):
+                module.unregister()
+        except Exception as e:
+            print(f"[SKLUM] [ObjectSetting] Error unregistering {name}: {e}")

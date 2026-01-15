@@ -1,21 +1,31 @@
 """Panel: SKLUM - Auto Rename"""
 
-from . import utils
-from . import properties
-from . import ui_list
-from . import menus
-from . import operators
-from . import handlers
-from . import panel
+import importlib
 
-modules = [utils, properties, ui_list, menus, operators, handlers, panel]
-
+submodules = [
+    'utils',
+    'properties',
+    'ui_list',
+    'menus',
+    'operators',
+    'handlers',
+    'panel',
+]
 
 def register():
-    for module in modules:
-        module.register()
-
+    for name in submodules:
+        try:
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'register'):
+                module.register()
+        except Exception as e:
+            print(f"[SKLUM] [AutoRename] Error registering {name}: {e}")
 
 def unregister():
-    for module in reversed(modules):
-        module.unregister()
+    for name in reversed(submodules):
+        try:
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'unregister'):
+                module.unregister()
+        except Exception as e:
+            print(f"[SKLUM] [AutoRename] Error unregistering {name}: {e}")

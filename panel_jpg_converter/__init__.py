@@ -1,21 +1,29 @@
 """Panel: SKLUM - JPG Converter"""
 
-from . import utils
-from . import properties
-from . import ui_list
-from . import operators
-from . import panel
+import importlib
 
-modules = [utils, properties, ui_list, operators, panel]
-
+submodules = [
+    'utils',
+    'properties',
+    'ui_list',
+    'operators',
+    'panel',
+]
 
 def register():
-    for module in modules:
-        if hasattr(module, 'register'):
-            module.register()
-
+    for name in submodules:
+        try:
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'register'):
+                module.register()
+        except Exception as e:
+            print(f"[SKLUM] [JPGConverter] Error registering {name}: {e}")
 
 def unregister():
-    for module in reversed(modules):
-        if hasattr(module, 'unregister'):
-            module.unregister()
+    for name in reversed(submodules):
+        try:
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'unregister'):
+                module.unregister()
+        except Exception as e:
+            print(f"[SKLUM] [JPGConverter] Error unregistering {name}: {e}")

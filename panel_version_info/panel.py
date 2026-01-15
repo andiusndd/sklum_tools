@@ -1,5 +1,7 @@
 import bpy
 import sys
+import os
+import tomllib
 from bpy.types import Panel, Operator
 from ..core.utils import check_for_update, download_and_install_update
 
@@ -16,8 +18,6 @@ class SKLUM_UpdateSettings(bpy.types.PropertyGroup):
 def get_local_version():
     """Lấy phiên bản hiện tại từ blender_manifest.toml."""
     try:
-        import os
-        import tomllib
         addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         manifest_path = os.path.join(addon_dir, "blender_manifest.toml")
         with open(manifest_path, "rb") as f:
@@ -77,6 +77,27 @@ class SKLUM_OT_install_update(Operator):
             
         return {'FINISHED'}
 
+class SKLUM_OT_open_log_file(Operator):
+    """Mở file log của addon"""
+    bl_idname = "sklum.open_log_file"
+    bl_label = "Open Log File"
+    
+    def execute(self, context):
+        addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        log_file = os.path.join(addon_dir, "logs", "sklum_tools.log")
+        
+        if os.path.exists(log_file):
+            import subprocess
+            if sys.platform == "win32":
+                os.startfile(log_file)
+            elif sys.platform == "darwin":
+                subprocess.call(["open", log_file])
+            else:
+                subprocess.call(["xdg-open", log_file])
+            return {'FINISHED'}
+        else:
+            self.report({'WARNING'}, "Log file not found yet.")
+            return {'CANCELLED'}
 
 class VIEW3D_PT_sklum_version_info(Panel):
     """Panel hiển thị thông tin phiên bản Addon"""
@@ -119,8 +140,10 @@ class VIEW3D_PT_sklum_version_info(Panel):
 
         # Row 2: Status Message
         row2 = layout.row(align=True)
-        # Using a small separator to give it some air if needed, otherwise just label
-        row2.label(text=settings.status_message, icon='NONE')
+        row2.label(text=settings.status_message, icon='INFO' if settings.is_update_available else 'NONE')
+        
+        # Log button (small)
+        row2.operator("sklum.open_log_file", text="", icon='TEXT')
         
         # Separator before License section
         layout.separator()
@@ -129,18 +152,23 @@ class VIEW3D_PT_sklum_version_info(Panel):
         scene = context.scene
         license_box = layout.box()
         
-        if not scene.sklum_license_active:
+        if not scene.sklum.license_active:
             # Not activated - show activation form
-            license_box.alert = True
-            license_box.label(text="⚠️ CHƯA KÍCH HOẠT LICENSE", icon='LOCKED')
+            if scene.sklum.license_message == "Validating...":
+                license_box.label(text="Đang xác thực...", icon='UI_STATS')
+            else:
+                license_box.alert = True
+                license_box.label(text="⚠️ CHƯA KÍCH HOẠT LICENSE", icon='LOCKED')
             
-            license_box.prop(scene, "sklum_license_key", text="License Key")
+            license_box.prop(scene.sklum, "license_key", text="License Key")
             
             row = license_box.row(align=True)
+            if scene.sklum.license_message == "Validating...":
+                row.enabled = False
             row.operator("sklum.activate_license", text="Kích Hoạt", icon='KEY_HLT')
             
-            if scene.sklum_license_message:
-                license_box.label(text=scene.sklum_license_message, icon='INFO')
+            if scene.sklum.license_message and scene.sklum.license_message != "Validating...":
+                license_box.label(text=scene.sklum.license_message, icon='INFO')
                 
             license_box.separator()
             license_box.label(text="Vui lòng kích hoạt để sử dụng các công cụ.")
@@ -155,6 +183,7 @@ classes = (
     SKLUM_UpdateSettings,
     SKLUM_OT_check_update,
     SKLUM_OT_install_update,
+    SKLUM_OT_open_log_file,
     VIEW3D_PT_sklum_version_info,
 )
 

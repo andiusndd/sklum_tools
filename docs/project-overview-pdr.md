@@ -1,35 +1,28 @@
-# Project Overview & PDR - SKLUM Tools
+# Project Overview & PDR: SKLUM Tools
 
-## 1. Introduction
-**SKLUM Tools** is a comprehensive Blender Addon designed to streamline 3D production workflows. It provides a suite of utilities for Mesh checking, Material management, Batch renaming, Import/Export automation, and Object manipulation.
+## 1. Executive Summary
+**SKLUM Tools** is a specialized Blender addon designed for 3D artists and production pipelines. Its primary purpose is to automate mesh validation, material standardization (IDP), and scene optimization to ensure assets are "production-ready" for real-time applications and high-quality rendering.
 
-## 2. Product Vision
-To become the "Swiss Army Knife" for 3D artists, ensuring quality control (Checking) and accelerating repetitive tasks (Automation) while protecting intellectual property via a robust Licensing System.
+## 2. Product Development Requirements (PDR)
 
-## 3. Key Features
+### 2.1 Target Audience
+- 3D Artists (Mesh checking, UV validation).
+- Technical Artists (Material standardization, color space management).
+- Pipeline Engineers (Auto-renaming via CSV, batch export).
 
-### 3.1. Quality Assurance (Checker & Tools)
-- **UV Checking**: Detect overlapping UVs, UVs outside 0-1 range.
-- **Mesh Integrity**: Detect N-gons, Triangle counts, Sharp edges without seams.
-- **Material Checks**: Validate Color Space (sRGB/Non-Color), Texture packing.
-- **Origin/Transform**: Validate object origins and transform applications.
+### 2.2 Core Modules
+- **Registration & Modularity**: Lazy loading of sub-modules to prevent circular imports.
+- **Licensing & DRM**: Non-blocking background hardware ID (HWID) validation with 24-hour persistence.
+- **Checker Logic**: Automated checks for UVs, Hard Edges, Vertex Groups, and Material Properties.
+- **Update System**: Resilient atomic "Rename-Swap" update mechanism for Windows.
+- **Logging**: Centralized logging to both Blender console and local disk.
 
-### 3.2. Workflow Acceleration
-- **Auto Rename**: Batch renaming using CSV rules.
-- **JPG Converter**: Mass convert PNG textures to JPG to reduce file size.
-- **Import/Export**: Streamlined FBX/GLB export with automatic texture packing/cleaning.
-- **Object Settings**: Quick access to common object properties (Shading, Visibility, Parenting) in one panel.
+### 2.3 User Experience Goals
+- No UI freezing during network operations.
+- Clear visual feedback (Progress bars, Log access).
+- One-click "Fix" operators for common mesh errors.
 
-### 3.3. Licensing & DRM
-- **Device Locking**: Limits usage to one machine per license key.
-- **Online Validation**: Verifies keys against a cloud database (Supabase).
-- **Security**: Obfuscated client-side logic to deter casual piracy.
-
-## 4. Target Audience
-- **3D Artists**: Modelers and Texture artists working on production pipelines.
-- **QA Leads**: Responsible for verifying asset technical standards.
-
-## 5. Deployment
-- **Platform**: Windows (primary), macOS/Linux (supported by Blender API).
-- **Distribution**: Zip File (generated via `/export` workflow).
-- **Backend**: Vercel (API) + Supabase (Database).
+## 3. Key Differentiators
+- **IDP Integration**: Support for CSV-driven object and material renaming.
+- **Atomic Operations**: Update system that bypasses Windows file locks.
+- **Performance-First**: Extensive use of memoization and background threading.

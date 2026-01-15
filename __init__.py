@@ -9,56 +9,99 @@ bl_info = {
 }
 
 import bpy
+import importlib
+import time
 from bpy.app.handlers import persistent
-from .core.license_logic import validate_license
 
-from . import core
-from . import panel_checker_tools
-from . import panel_import_export
-from . import panel_jpg_converter
-from . import panel_auto_rename
-from . import panel_object_setting
-from . import panel_version_info
-
-
-modules = [
-    core,
-    panel_checker_tools,
-    panel_import_export,
-    panel_jpg_converter,
-    panel_auto_rename,
-    panel_object_setting,
-    panel_version_info,
+# Sub-packages to manage
+sub_packages = [
+    'core',
+    'panel_checker_tools',
+    'panel_import_export',
+    'panel_jpg_converter',
+    'panel_auto_rename',
+    'panel_object_setting',
+    'panel_version_info',
 ]
+
+def _check_validation_timer():
+    """Polls for background validation results without blocking the UI."""
+    from .core.license_logic import get_async_result
+    from .core.logger import logger
+    
+    result = get_async_result()
+    if result is None:
+        return 0.5  # Check again in 0.5s
+    
+    is_valid, message, timestamp = result
+    
+    # Update all active scenes (or just current)
+    for scene in bpy.data.scenes:
+        if hasattr(scene, "sklum"):
+            scene.sklum.license_active = is_valid
+            scene.sklum.license_message = message
+    
+    # Update persistent cache
+    package_name = __package__.split('.')[0]
+    prefs = bpy.context.preferences.addons.get(package_name)
+    if prefs:
+        prefs.preferences.license_is_valid_cache = is_valid
+        prefs.preferences.license_last_validated = timestamp
+    
+    if is_valid:
+        logger.info(f"Background validation successful: {message}")
+    else:
+        logger.warning(f"Background validation failed: {message}")
+        
+    return None  # Stop timer
 
 @persistent
 def auto_activate_license(dummy):
-    """Checks for stored license key and validates it on startup."""
+    """Checks for stored license key and validates it asynchronously."""
     try:
-        # Get addon preferences
-        # Note: __package__ might be 'SKLUMToolz' or 'SKLUMToolz.something'
-        package_name = __name__.split('.')[0]
+        from .core.license_logic import validate_license_async
+        from .core.logger import logger
+        
+        package_name = __package__.split('.')[0]
         prefs = bpy.context.preferences.addons.get(package_name)
         
         if prefs and prefs.preferences.license_key:
-            # Validate quietly
-            is_valid, message = validate_license(prefs.preferences.license_key)
-            if is_valid:
-                bpy.context.scene.sklum_license_active = True
-                bpy.context.scene.sklum_license_message = message
-                print(f"[SKLUM] Auto-activated license: {message}")
-            else:
-                bpy.context.scene.sklum_license_active = False
-                # Silent fail on startup, user will see locked panel
-                print(f"[SKLUM] Auto-activation failed: {message}")
+            # CHECK CACHE FIRST (TTL: 24 Hours)
+            now = time.time()
+            last_val = prefs.preferences.license_last_validated
+            is_valid_cache = prefs.preferences.license_is_valid_cache
+            
+            # If validated within last 24h and was valid, use cache immediately
+            if is_valid_cache and (now - last_val < 86400):
+                if hasattr(bpy.context.scene, "sklum"):
+                    bpy.context.scene.sklum.license_active = True
+                    bpy.context.scene.sklum.license_message = "Validated from Cache"
+                logger.info("License validated from 24h cache.")
+                return 
+
+            # Otherwise, start background validation
+            logger.info("Starting background license validation...")
+            if hasattr(bpy.context.scene, "sklum"):
+                 bpy.context.scene.sklum.license_message = "Validating..."
+            
+            if validate_license_async(prefs.preferences.license_key):
+                # Start polling timer
+                if not bpy.app.timers.is_registered(_check_validation_timer):
+                    bpy.app.timers.register(_check_validation_timer)
+                    
     except Exception as e:
         print(f"[SKLUM] Auto-activation error: {e}")
 
 
 def register():
-    for module in modules:
-        if hasattr(module, "register"):
-            module.register()
+    # Register sub-packages
+    for name in sub_packages:
+        try:
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, "register"):
+                module.register()
+        except Exception as e:
+            print(f"[SKLUM] [Root] Error registering {name}: {e}")
     
     if auto_activate_license not in bpy.app.handlers.load_post:
         bpy.app.handlers.load_post.append(auto_activate_license)
@@ -67,10 +110,19 @@ def register():
 def unregister():
     if auto_activate_license in bpy.app.handlers.load_post:
         bpy.app.handlers.load_post.remove(auto_activate_license)
+    
+    if bpy.app.timers.is_registered(_check_validation_timer):
+        bpy.app.timers.unregister(_check_validation_timer)
 
-    for module in reversed(modules):
-        if hasattr(module, "unregister"):
-            module.unregister()
+    # Unregister in reverse order
+    for name in reversed(sub_packages):
+        try:
+            full_name = f"{__package__}.{name}"
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, "unregister"):
+                module.unregister()
+        except Exception as e:
+            print(f"[SKLUM] [Root] Error unregistering {name}: {e}")
 
 
 if __name__ == "__main__":

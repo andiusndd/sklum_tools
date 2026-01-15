@@ -11,12 +11,12 @@ class SKLUM_OT_activate_license(Operator):
     
     def execute(self, context):
         scene = context.scene
-        key = scene.sklum_license_key
+        key = scene.sklum.license_key
         
         is_valid, msg = license_logic.validate_license(key)
         
-        scene.sklum_license_message = msg
-        scene.sklum_license_active = is_valid
+        scene.sklum.license_message = msg
+        scene.sklum.license_active = is_valid
         
         if is_valid:
             # Save key to preferences
@@ -42,9 +42,9 @@ class SKLUM_OT_deactivate_license(Operator):
     def execute(self, context):
         scene = context.scene
         # For mock phase, just clear locally
-        scene.sklum_license_active = False
-        scene.sklum_license_key = ""
-        scene.sklum_license_message = "Đã gỡ license thành công."
+        scene.sklum.license_active = False
+        scene.sklum.license_key = ""
+        scene.sklum.license_message = "Đã gỡ license thành công."
         
         # Clear key from preferences
         try:

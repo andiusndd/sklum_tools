@@ -1,51 +1,37 @@
-# System Architecture
+# System Architecture: SKLUM Tools
 
-## High-Level Diagram
+## 1. High-Level Overview
+SKLUM Tools is a modular Blender addon. It separates UI (Panels), Logic (Operators), and Data (Properties) following a model-view-controller (MVC) inspiration, adapted for the Blender API.
 
-```mermaid
-graph TD
-    User[User / 3D Artist] -->|Uses| Blender[Blender App]
-    Blender -->|Install| Addon[SKLUM Tools Addon]
-    
-    subgraph Client [Client Side]
-        Addon -->|1. Get HWID| Hardware[Windows WMI]
-        Addon -->|2. Check Logic| Core[Core Logic]
-        Addon -->|3. UI| Panel[Sidebar Panel]
-    end
-    
-    subgraph Cloud [Server Side]
-        Addon -->|HTTPS POST| API[Vercel Serverless Function]
-        API -->|Query| DB[(Supabase PostgreSQL)]
-    end
-```
+## 2. Core Components
 
-## detailed Components
+### 2.1 The Registration Engine
+The root `__init__.py` acts as the entry point. It uses a **Lazy Dispatch pattern**:
+1. Checks for license validity (using 24h cache).
+2. Dynamically imports sub-packages (`core`, `panel_checker_tools`, etc.).
+3. Calls `register()` on each.
 
-### 1. Client (Blender Addon)
-- **Runtime**: Python 3.10+ (Embedded in Blender).
-- **Entry Point**: `__init__.py` registers the addon.
-- **License Module**:
-    - Generates fingerprint (`wmic csproduct get uuid`).
-    - Sends `{key, hwid}` payload to Server.
-    - Caches validation state in runtime memory (`Scene` property) to avoid re-checking every frame.
+### 2.2 Async License System
+Designed for performance and compliance:
+- `validate_license_async`: Spawns a background thread.
+- `bpy.app.timers`: Polls the thread for results.
+- Persistent Cache: Stores validation in `AddonPreferences` to bypass network on session restart.
 
-### 2. Server API (Vercel)
-- **Endpoint**: `/api/index` (POST).
-- **Framework**: Python `http.server` (Raw) or lightweight framework.
-- **Logic**:
-    - **New Key**: Binds received HWID to the Key.
-    - **Existing Key (Same HWID)**: Updates `last_check` timestamp, Returns **OK**.
-    - **Existing Key (Diff HWID)**: Returns **403 Forbidden**.
-    - **Banned Key**: Returns **403 Forbidden**.
+### 2.3 Atomic Update Mechanism
+Bypasses Windows file locks (`WinError 32`):
+- Stage: Extract new version to temp.
+- Swap: Rename current dir to `SKLUMToolz_old` $\rightarrow$ Move new version to original path.
+- Cleanup: Try to delete `_old` dir (fails gracefully).
 
-### 3. Database (Supabase)
-- **Table**: `licenses`
-    - `key` (PK): License string.
-    - `hwid`: Machine ID lock.
-    - `status`: Control flag ('active', 'banned').
-    - `email`: Customer reference.
+### 2.4 Checker Framework
+Centralized in `core/checker_logic.py`:
+- Pure Python functions with no UI code.
+- Returns structured `CheckResult` objects.
+- Allows the "Check All" operator to aggregate multiple checks efficiently.
 
-## Security Model
-- **"Gentleman's Lock"**: The primary goal is to prevent casual sharing (1 key = 1 machine).
-- **Obfuscation**: `core/license_logic.py` is encrypted using PyArmor to prevent simple "Comment out the check" attacks.
-- **No Offline Mode**: Currently requires Internet for activation (Mock/Real). *Future consideration: Offline token.*
+## 3. Data Flow
+1. **User Interaction**: User clicks a button in a Panel.
+2. **Operator Execution**: Operator calls a function in `core`.
+3. **Internal Processing**: Logic uses `constants.py` and returns data.
+4. **State Update**: Result is written to `bpy.context.scene.sklum`.
+5. **UI Refresh**: Blender's draw loop updates the panel based on the new property state.

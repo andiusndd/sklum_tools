@@ -15,7 +15,7 @@ class SKLUM_PT_ObjectSetting(Panel):
     @classmethod
     def poll(cls, context):
         """Only show this panel if license is active"""
-        return context.scene.sklum_license_active
+        return context.scene.sklum.license_active
 
     def draw(self, context):
         layout = self.layout

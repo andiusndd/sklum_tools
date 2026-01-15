@@ -3,39 +3,39 @@ Panel: SKLUM - Checker & Tools
 Panel chính chứa các công cụ kiểm tra và tiện ích
 """
 
-from . import properties
-from . import panel
-from . import check_all
-from . import rename_uvmap
-from . import hard_edges
-from . import color_space
-from . import active_point
-from . import seam_sharp
-from . import grid_checker
-from . import license_manager # New
+import importlib
 
-
-modules = [
-    properties,
-    check_all,
-    rename_uvmap,
-    hard_edges,
-    color_space,
-    active_point,
-    seam_sharp,
-    grid_checker,
-    license_manager, # New
-    panel,
+# List of submodules to manage
+submodules = [
+    'properties',
+    'check_all',
+    'rename_uvmap',
+    'hard_edges',
+    'color_space',
+    'active_point',
+    'seam_sharp',
+    'grid_checker',
+    'license_manager',
+    'panel',
 ]
 
-
 def register():
-    for module in modules:
-        if hasattr(module, 'register'):
-            module.register()
-
+    for name in submodules:
+        try:
+            # Import on demand to prevent top-level cycles
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'register'):
+                module.register()
+        except Exception as e:
+            print(f"[SKLUM] [CheckerTools] Error registering {name}: {e}")
 
 def unregister():
-    for module in reversed(modules):
-        if hasattr(module, 'unregister'):
-            module.unregister()
+    for name in reversed(submodules):
+        try:
+            # Check if module is still in memory
+            full_name = f"{__package__}.{name}"
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'unregister'):
+                module.unregister()
+        except Exception as e:
+            print(f"[SKLUM] [CheckerTools] Error unregistering {name}: {e}")

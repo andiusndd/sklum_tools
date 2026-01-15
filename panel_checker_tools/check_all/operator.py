@@ -18,93 +18,114 @@ class SKLUM_OT_check_all(Operator):
         return True
 
     def execute(self, context):
+        scene = context.scene
+        sklum = scene.sklum
+        wm = context.window_manager
+
         # LICENSE CHECK
-        if not context.scene.sklum_license_active:
+        if not sklum.license_active:
              self.report({'ERROR'}, "Vui lòng kích hoạt License để sử dụng.")
              return {'CANCELLED'}
 
-        # Call all individual check operators sequentially using hasattr for safety
-        if hasattr(bpy.ops.sklum, 'check_seam'):
-            bpy.ops.sklum.check_seam('EXEC_DEFAULT')
-        
-        if hasattr(bpy.ops.sklum, 'check_color_space'):
-            bpy.ops.sklum.check_color_space('EXEC_DEFAULT')
+        # START PROGRESS BAR
+        total_steps = 11  # Number of checks being run
+        wm.progress_begin(0, total_steps)
+        current_step = 0
+
+        try:
+            # 1. Seam Check
+            current_step += 1
+            wm.progress_update(current_step)
+            if hasattr(bpy.ops.sklum, 'check_seam'):
+                bpy.ops.sklum.check_seam('EXEC_DEFAULT')
             
-        if hasattr(bpy.ops.sklum, 'check_active_point'):
-            bpy.ops.sklum.check_active_point('EXEC_DEFAULT')
+            # 2. Color Space Check
+            current_step += 1
+            wm.progress_update(current_step)
+            if hasattr(bpy.ops.sklum, 'check_color_space'):
+                bpy.ops.sklum.check_color_space('EXEC_DEFAULT')
+                
+            # 3. Active Point Check
+            current_step += 1
+            wm.progress_update(current_step)
+            if hasattr(bpy.ops.sklum, 'check_active_point'):
+                bpy.ops.sklum.check_active_point('EXEC_DEFAULT')
+                
+            # 4. Refresh Rename List
+            current_step += 1
+            wm.progress_update(current_step)
+            if hasattr(bpy.ops.sklum, 'refresh_rename_list'):
+                bpy.ops.sklum.refresh_rename_list('EXEC_DEFAULT')
+
+            # 5. Grid Check
+            current_step += 1
+            wm.progress_update(current_step)
+            if hasattr(bpy.ops.sklum, 'check_grid3'):
+                bpy.ops.sklum.check_grid3('EXEC_DEFAULT', mode='TRIANGLE')
+
+            # --- CORE LOGIC CHECKS ---
+            sklum.check_results_data.clear()
             
-        if hasattr(bpy.ops.sklum, 'refresh_rename_list'):
-            bpy.ops.sklum.refresh_rename_list('EXEC_DEFAULT')
+            def add_result(label, res):
+                item = sklum.check_results_data.add()
+                item.label = label
+                item.status = res.status
+                item.message = res.message
+                item.failed_count = len(res.failed_objects) if res.failed_objects else 0
+                return item
 
-        # Gọi check_grid3 với mode triangle (tam giác)
-        if hasattr(bpy.ops.sklum, 'check_grid3'):
-            bpy.ops.sklum.check_grid3('EXEC_DEFAULT', mode='TRIANGLE')
+            selected = context.selected_objects
 
-        scene = context.scene
-        
-        # Clear previous results
-        scene.sklum_check_results_data.clear()
-        
-        def add_result(label, res):
-            item = scene.sklum_check_results_data.add()
-            item.label = label
-            item.status = res.status
-            item.message = res.message
-            item.failed_count = len(res.failed_objects) if res.failed_objects else 0
+            # 6. UVMap
+            current_step += 1
+            wm.progress_update(current_step)
+            add_result("UVMap", checker_logic.check_uv_map(selected))
             
-            # Legacy string support (temporary, can remove if UI is fully updated)
-            # We keep it empty or simple to avoid errors if UI still references it
-            return item
+            # 7. UV Outside
+            current_step += 1
+            wm.progress_update(current_step)
+            add_result("UV Outside", checker_logic.check_uv_outside(selected))
+            
+            # 8. Texture Pack
+            current_step += 1
+            wm.progress_update(current_step)
+            add_result("Texture Pack", checker_logic.check_texture_pack(bpy.data.materials))
+            
+            # 9. Edge Sharp/Crease
+            current_step += 1
+            wm.progress_update(current_step)
+            add_result("Edge Sharp/Crease", checker_logic.check_edge_sharp_crease(selected))
+            
+            # 10. Vertex Groups
+            current_step += 1
+            wm.progress_update(current_step)
+            add_result("Vertex Group", checker_logic.check_vertex_groups(selected))
+            
+            # 11. Modifiers
+            current_step += 1
+            wm.progress_update(current_step)
+            add_result("Modifier", checker_logic.check_modifiers(selected))
 
-        # Check UVMap
-        add_result("UVMap", checker_logic.check_uv_map(context.selected_objects))
-        
-        # Check UV Outside
-        add_result("UV Outside", checker_logic.check_uv_outside(context.selected_objects))
-        
-        # Check Texture Pack
-        add_result("Texture Pack", checker_logic.check_texture_pack(bpy.data.materials))
-        
-        # Check Edge Sharp/Crease
-        add_result("Edge Sharp/Crease", checker_logic.check_edge_sharp_crease(context.selected_objects))
-        
-        # Check Vertex Groups
-        add_result("Vertex Group", checker_logic.check_vertex_groups(context.selected_objects))
-        
-        # Check Modifiers
-        add_result("Modifier", checker_logic.check_modifiers(context.selected_objects))
+        finally:
+            wm.progress_end()
 
-        # Generate summary string from structured data
+        # Generate summary string
         result_lines = []
-        
-        # Add other checks (legacy ones that are not yet migrated to new system if any)
-        # For now, we assume all critical checks are in sklum_check_results_data
-        # But wait, 'Seam', 'Color Space', 'Active Point', 'Triangle' are executed via OTHER operators.
-        # Those operators might still set their respective string properties.
-        # So we should still read them if they exist.
-        
         legacy_checks = [
-            ('Seam', 'sklum_seam_check_result'),
-            ('Color Space', 'sklum_color_space_check_result'),
-            ('Active Point', 'sklum_active_point_check_result'),
-            ('Triangle', 'sklum_grid3_check_result'),
+            ('Seam', 'seam_check_result'),
+            ('Color Space', 'color_space_check_result'),
+            ('Active Point', 'active_point_check_result'),
+            ('Triangle', 'grid3_check_result'),
         ]
         
         for label, attr in legacy_checks:
-            if hasattr(scene, attr):
-                msg = getattr(scene, attr)
+            if hasattr(sklum, attr):
+                msg = getattr(sklum, attr)
                 if msg:
-                     # Simple heuristics since we haven't refactored these yet
-                     if "[LỖI]" in msg or ("không" not in msg.lower() and "đúng" not in msg.lower() and "ok" not in msg.lower()):
-                         # This heuristic is weak, but keeps existing behavior for now
-                         if msg.startswith("[OK]") or msg.startswith("[LỖI]"):
-                             result_lines.append(msg)
-                         else:
-                             # Try to format it
-                             # But sticking to original string is safer if we don't know format
-                             result_lines.append(msg)
+                     result_lines.append(msg)
 
-        scene.sklum_check_all_result = "\n".join(result_lines)
+        sklum.check_all_result = "\n".join(result_lines)
+        self.report({'INFO'}, "All checks completed.")
 
         return {'FINISHED'}
 

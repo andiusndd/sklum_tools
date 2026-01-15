@@ -9,8 +9,8 @@ import requests
 import zipfile
 import shutil
 import tempfile
+import time
 from .constants import ORIGIN_TOLERANCE
-
 
 def get_selected_meshes(context):
     """Lấy danh sách các mesh objects đang được chọn"""
@@ -83,6 +83,7 @@ def check_for_update(repo_url):
     Returns: (is_update_available, latest_version_str, error_msg)
     """
     try:
+        from .logger import logger
         # Clean URL construction
         if repo_url.endswith(".git"):
             base_url = repo_url[:-4]
@@ -93,6 +94,7 @@ def check_for_update(repo_url):
         raw_base = base_url.replace("https://github.com/", "https://raw.githubusercontent.com/")
         manifest_url = f"{raw_base}/main/blender_manifest.toml"
         
+        logger.info(f"Checking updates from {manifest_url}")
         response = requests.get(manifest_url, timeout=10)
         response.raise_for_status()
         
@@ -107,12 +109,16 @@ def check_for_update(repo_url):
             local_manifest_data = tomllib.load(f)
         local_version_str = local_manifest_data.get("version", "0.0.0")
         
-        # Simple string comparison or tuple comparison if formatted correctly
         if remote_version_str != local_version_str:
+            logger.info(f"New version found: {remote_version_str} (Local: {local_version_str})")
             return True, remote_version_str, None
+        
+        logger.info("Addon is up to date.")
         return False, local_version_str, None
         
     except Exception as e:
+        from .logger import logger
+        logger.error(f"Error checking for updates: {e}")
         return False, None, str(e)
 
 
@@ -120,7 +126,7 @@ def safe_remove(path, max_attempts=5, delay=0.5):
     """
     Thử xóa file nhiều lần với khoảng trễ để tránh WinError 32 trên Windows.
     """
-    import time
+    from .logger import logger
     for i in range(max_attempts):
         try:
             if os.path.exists(path):
@@ -130,15 +136,16 @@ def safe_remove(path, max_attempts=5, delay=0.5):
                     os.remove(path)
             return True
         except Exception as e:
-            print(f"Cleanup attempt {i+1} failed for {path}: {e}")
+            logger.warning(f"Delete attempt {i+1} failed for {path}: {e}")
             time.sleep(delay)
     return False
 
 
 def download_and_install_update(repo_url):
     """
-    Tải về và cài đặt bản cập nhật từ GitHub.
+    Tải về và cài đặt bản cập nhật từ GitHub sử dụng chiến lược 'Rename-Swap'.
     """
+    from .logger import logger
     try:
         # Clean URL construction
         if repo_url.endswith(".git"):
@@ -151,6 +158,7 @@ def download_and_install_update(repo_url):
         
         try:
             zip_url = f"{base_url}/archive/refs/heads/main.zip"
+            logger.info(f"Downloading update from {zip_url}")
             
             response = requests.get(zip_url, stream=True, timeout=30)
             response.raise_for_status()
@@ -160,41 +168,59 @@ def download_and_install_update(repo_url):
                     tmp_file.write(chunk)
                 tmp_path = tmp_file.name
                 
-            # Get addon directory
+            # Current addon directory (e.g., .../scripts/addons/SKLUMToolz)
             addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            addon_parent = os.path.dirname(addon_dir)
+            addon_folder_name = os.path.basename(addon_dir)
             
+            logger.info(f"Extracting to temporary directory...")
             with zipfile.ZipFile(tmp_path, 'r') as zip_ref:
-                # Extract to a temp directory first
                 temp_extract_dir = tempfile.mkdtemp()
                 zip_ref.extractall(temp_extract_dir)
                 
-                # The zip usually contains a folder named "repo_name-main"
                 extracted_folders = os.listdir(temp_extract_dir)
                 if not extracted_folders:
                     raise Exception("Zip file is empty")
                 
                 source_dir = os.path.join(temp_extract_dir, extracted_folders[0])
                 
-                # Replace files in the current addon directory
-                for item in os.listdir(source_dir):
-                    s = os.path.join(source_dir, item)
-                    d = os.path.join(addon_dir, item)
-                    if os.path.isdir(s):
-                        if os.path.exists(d):
-                            shutil.rmtree(d)
-                        shutil.copytree(s, d)
+                # --- START ATOMIC SWAP ---
+                # 1. Prepare old directory path
+                timestamp = int(time.time())
+                old_dir = os.path.join(addon_parent, f"{addon_folder_name}_old_{timestamp}")
+                
+                logger.info(f"Swapping directories...")
+                
+                # 2. Rename current to old
+                os.rename(addon_dir, old_dir)
+                
+                try:
+                    # 3. Move new directory to current path
+                    shutil.move(source_dir, addon_dir)
+                    logger.info("Update files moved into place.")
+                    
+                    # 4. Success! Try to cleanup the old dir (might still fail on Windows, but that's OK)
+                    if safe_remove(old_dir):
+                        logger.info("Cleanup successful.")
                     else:
-                        shutil.copy2(s, d)
+                        logger.warning(f"Could not delete old version at {old_dir}. It will be orphaned but doesn't affect the update.")
+                        
+                except Exception as e:
+                    # Rollback: Try to move old back to current if swap failed
+                    logger.error(f"Installation failed, attempting rollback: {e}")
+                    if os.path.exists(old_dir) and not os.path.exists(addon_dir):
+                        os.rename(old_dir, addon_dir)
+                    raise e
                 
             return True, "Update installed successfully. Please restart Blender."
             
         finally:
-            # Cleanup source files
+            # Cleanup temp files
             if temp_extract_dir and os.path.exists(temp_extract_dir):
                 safe_remove(temp_extract_dir)
-            # Cleanup the downloaded ZIP
             if tmp_path and os.path.exists(tmp_path):
                 safe_remove(tmp_path)
         
     except Exception as e:
+        logger.error(f"Update failed: {e}")
         return False, str(e)

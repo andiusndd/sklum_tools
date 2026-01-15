@@ -1,17 +1,27 @@
 """Panel: SKLUM - Import/Export"""
 
-from . import operators
-from . import panel
-from . import properties
+import importlib
 
-modules = [properties, operators, panel]
-
+submodules = [
+    'properties',
+    'operators',
+    'panel',
+]
 
 def register():
-    for module in modules:
-        module.register()
-
+    for name in submodules:
+        try:
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'register'):
+                module.register()
+        except Exception as e:
+            print(f"[SKLUM] [ImportExport] Error registering {name}: {e}")
 
 def unregister():
-    for module in reversed(modules):
-        module.unregister()
+    for name in reversed(submodules):
+        try:
+            module = importlib.import_module(f".{name}", __package__)
+            if hasattr(module, 'unregister'):
+                module.unregister()
+        except Exception as e:
+            print(f"[SKLUM] [ImportExport] Error unregistering {name}: {e}")

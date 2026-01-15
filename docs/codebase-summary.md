@@ -1,52 +1,36 @@
-# Codebase Summary
+# Codebase Summary: SKLUM Tools
 
-## Directory Structure
+## 1. Directory Structure
 
-```
-SKLUMToolz/
-├── __init__.py                # Main Entry Point
-├── blender_manifest.toml      # Blender 4.2+ Extension Manifest
-├── core/                      # Shared Logic & Utilities
-│   ├── checker_logic.py       # Core algorithms for Mesh/UV checks
-│   ├── license_logic.py       # DRM: HWID fetch & API validation
-│   ├── utils.py               # Helper functions
-│   ├── preferences.py         # Addon Preferences UI
-│   └── ...
-├── panel_checker_tools/       # [PANEL] QA Tools
-│   ├── check_all/             # "Check All" Orchestrator
-│   ├── license_manager/       # DRM UI & Operators
-│   └── ...
-├── panel_import_export/       # [PANEL] IO Automation
-├── panel_jpg_converter/       # [PANEL] Image Processing
-├── panel_auto_rename/         # [PANEL] Batch Renaming
-├── panel_object_setting/      # [PANEL] General Object Tools
-├── server_backend/            # [EXTERNAL] Server-side Code
-│   ├── api/index.py           # Vercel Serverless Function
-│   └── schema.sql             # Supabase Database Schema
-└── docs/                      # Project Documentation
-```
+- `__init__.py`: Root entry point. Handles lazy module dispatch and auto-licensing.
+- `core/`: Global foundation.
+    - `logger.py`: Centralized logging.
+    - `license_logic.py`: Async DRM and HWID fetch.
+    - `checker_logic.py`: Low-level mesh validation algorithms.
+    - `utils.py`: Update logic and shared helpers.
+- `panel_checker_tools/`: The primary "Check All" interface.
+- `panel_auto_rename/`: CSV-driven naming system.
+- `panel_import_export/`: GLB/FBX export and cleanup.
+- `panel_jpg_converter/`: PNG to JPG optimization.
+- `panel_object_setting/`: Viewport and pivot management.
+- `panel_version_info/`: Lifecycle management (Update/License).
+- `server_backend/`: Validation logic for the Vercel API.
 
-## Module Responsibilities
+## 2. Key Data Models
 
-### Core Modules
-- **`core.checker_logic`**: Pure Python functions (mostly) that take Blender objects and return validation results (Pass/Fail). Decoupled from UI code where possible.
-- **`core.license_logic`**: Handles the critical security loop.
-    - `get_machine_id`: Uses `wmic` on Windows to get unique motherboard UUID.
-    - `validate_license`: HTTPS call to Vercel API.
+### `SKLUM_SceneSettings` (`core/properties.py`)
+Centralized PointerProperty on `bpy.types.Scene`. Holds:
+- `license_active`, `license_message`.
+- Expansion states for UI panels.
+- Aggregated check results.
 
-### UI Panels (`panel_*`)
-Each panel follows a modular structure:
-- `panel.py`: Defines `bpy.types.Panel` classes for drawing the UI.
-- `operator.py`: Defines `bpy.types.Operator` for action logic.
-- `properties.py`: Defines `bpy.types.PropertyGroup` for UI state.
-- `__init__.py`: Registry for the module.
+### `CheckResult` (`core/checker_logic.py`)
+Dataclass for check outputs:
+- `status`: Pass/Fail.
+- `message`: User-friendly status.
+- `failed_objects`: List of problematic mesh names.
 
-### Backend (`server_backend`)
-*Not distributed with the Addon Zip.*
-- **Technology**: Python Http.server (Vercel Adapter).
-- **Database**: PostgreSQL (Supabase) storing `licenses` table.
-
-## Key Data Stuctures
-- **`CheckResult`** (`core/checker_logic.py`): Standardized DTO for validation results (Status, Message, Failed Objects List).
-- **`SKLUM_CheckResultItem`** (`panel_checker_tools/properties.py`): Blender CollectionProperty items for displaying results in a structured UI list.
-- **License Data**: Stored in `Scene.sklum_license_key` (Transient) or Addon Preferences (Persistent - *Planned*).
+## 3. Communication Patterns
+- **Internal**: Panels trigger Operators which call `core` functions.
+- **External**: `license_logic` communicates with a Vercel-hosted API via `requests`.
+- **Feedback**: Operators use `window_manager` for progress and `logger` for persistent logs.

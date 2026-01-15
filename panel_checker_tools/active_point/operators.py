@@ -66,8 +66,9 @@ class SKLUM_OT_check_active_point(Operator):
 
     def execute(self, context):
         scene = context.scene
+        sklum = scene.sklum
         scene.sklum_active_point_list.clear()
-        scene.sklum_active_point_needs_fix = False
+        sklum.active_point_needs_fix = False
 
         for obj in context.selected_objects:
             if obj.type != 'MESH':
@@ -88,14 +89,14 @@ class SKLUM_OT_check_active_point(Operator):
             item.is_standard = is_standard
 
             if not is_standard:
-                scene.sklum_active_point_needs_fix = True
+                sklum.active_point_needs_fix = True
 
         if not context.selected_objects:
-            scene.sklum_active_point_check_result = "Chưa chọn vật nào để kiểm tra."
-        elif scene.sklum_active_point_needs_fix:
-            scene.sklum_active_point_check_result = "Phát hiện lỗi Active Point!"
+            sklum.active_point_check_result = "Chưa chọn vật nào để kiểm tra."
+        elif sklum.active_point_needs_fix:
+            sklum.active_point_check_result = "Phát hiện lỗi Active Point!"
         else:
-            scene.sklum_active_point_check_result = "Tất cả Active Point đều đúng tiêu chuẩn."
+            sklum.active_point_check_result = "Tất cả Active Point đều đúng tiêu chuẩn."
 
         return {'FINISHED'}
 
@@ -122,7 +123,7 @@ class SKLUM_OT_fix_active_point(Operator):
             fixed_count += 1
 
         self.report({'INFO'}, f"Đã sửa {fixed_count} vật về tiêu chuẩn Active Point.")
-        context.scene.sklum_active_point_needs_fix = False
+        context.scene.sklum.active_point_needs_fix = False
         bpy.ops.sklum.check_active_point('EXEC_DEFAULT')
         return {'FINISHED'}
 
@@ -134,7 +135,7 @@ class SKLUM_OT_group_objects(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if context.scene.sklum_active_point_needs_fix:
+        if context.scene.sklum.active_point_needs_fix:
             self.report({'ERROR'}, "Vui lòng sửa tất cả Active Point trước khi gộp.")
             return {'CANCELLED'}
 
@@ -200,7 +201,9 @@ def register():
 
 
 def unregister():
-    del bpy.types.Scene.sklum_active_point_list
-    del bpy.types.Scene.sklum_active_point_index
+    if hasattr(bpy.types.Scene, 'sklum_active_point_list'):
+        del bpy.types.Scene.sklum_active_point_list
+    if hasattr(bpy.types.Scene, 'sklum_active_point_index'):
+        del bpy.types.Scene.sklum_active_point_index
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

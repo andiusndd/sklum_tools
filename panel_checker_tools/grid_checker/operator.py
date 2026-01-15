@@ -46,6 +46,7 @@ class SKLUM_OT_check_grid3(Operator):
 
     def execute(self, context):
         scene = context.scene
+        sklum = scene.sklum
         scene.sklum_grid3_list.clear()
 
         found = False
@@ -74,17 +75,17 @@ class SKLUM_OT_check_grid3(Operator):
             item.is_grid3 = False
 
         if not context.selected_objects:
-            scene.sklum_grid3_check_result = "Chưa chọn vật nào để kiểm tra."
+            sklum.grid3_check_result = "Chưa chọn vật nào để kiểm tra."
         elif found:
             if self.mode == 'TRIANGLE':
-                scene.sklum_grid3_check_result = "Đã chọn các mặt tam giác (triangle) trong edit mode."
+                sklum.grid3_check_result = "Đã chọn các mặt tam giác (triangle) trong edit mode."
             else:
-                scene.sklum_grid3_check_result = "Đã chọn các mặt N-gon (>4 cạnh) trong edit mode."
+                sklum.grid3_check_result = "Đã chọn các mặt N-gon (>4 cạnh) trong edit mode."
         else:
             if self.mode == 'TRIANGLE':
-                scene.sklum_grid3_check_result = "Không tìm thấy mặt tam giác nào."
+                sklum.grid3_check_result = "Không tìm thấy mặt tam giác nào."
             else:
-                scene.sklum_grid3_check_result = "Không tìm thấy mặt N-gon nào (>4 cạnh)."
+                sklum.grid3_check_result = "Không tìm thấy mặt N-gon nào (>4 cạnh)."
         return {'FINISHED'}
 
 
@@ -103,7 +104,9 @@ def register():
 
 
 def unregister():
-    del bpy.types.Scene.sklum_grid3_list
-    del bpy.types.Scene.sklum_grid3_index
+    if hasattr(bpy.types.Scene, 'sklum_grid3_list'):
+        del bpy.types.Scene.sklum_grid3_list
+    if hasattr(bpy.types.Scene, 'sklum_grid3_index'):
+        del bpy.types.Scene.sklum_grid3_index
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

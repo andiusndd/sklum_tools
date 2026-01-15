@@ -4,7 +4,7 @@ Addon Preferences - Centralized preference management for SKLUM Tools
 
 import bpy
 from bpy.types import AddonPreferences
-from bpy.props import StringProperty
+from bpy.props import StringProperty, FloatProperty, BoolProperty
 
 
 class SKLUMToolsPreferences(AddonPreferences):
@@ -19,7 +19,8 @@ class SKLUMToolsPreferences(AddonPreferences):
         name="License Key",
         description="SKLUM Tools license key for activation",
         default="",
-        options={'HIDDEN', 'SKIP_SAVE'}  # Don't show in UI, handled by panels
+        subtype='PASSWORD',
+        options={'HIDDEN'}  # Removed SKIP_SAVE to allow persistence
     )
     
     # CSV File Path for Auto Rename feature
@@ -28,6 +29,17 @@ class SKLUMToolsPreferences(AddonPreferences):
         description="Path to CSV file containing IDP data for auto-rename",
         default="",
         subtype='FILE_PATH'
+    )
+    
+    # Cache for license validation
+    license_last_validated: FloatProperty(
+        name="Last Validated Timestamp",
+        default=0.0
+    )
+    
+    license_is_valid_cache: BoolProperty(
+        name="Is License Valid Cache",
+        default=False
     )
     
     def draw(self, context):

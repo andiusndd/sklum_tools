@@ -136,7 +136,9 @@ def register():
 
 
 def unregister():
-    del bpy.types.Scene.sklum_rename_list
-    del bpy.types.Scene.sklum_rename_index
+    if hasattr(bpy.types.Scene, 'sklum_rename_list'):
+        del bpy.types.Scene.sklum_rename_list
+    if hasattr(bpy.types.Scene, 'sklum_rename_index'):
+        del bpy.types.Scene.sklum_rename_index
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
