@@ -2,6 +2,7 @@ import bpy
 import importlib
 import sys
 import os
+from bpy.app.handlers import persistent
 
 # --- Constants ---
 ADDON_PACKAGE = __package__
@@ -37,7 +38,18 @@ def register():
 
     # Auto-activate license on startup
     from .core.license_logic import auto_activate_license
+    
+    # 1. Run once on startup
     bpy.app.timers.register(auto_activate_license, first_interval=1.0)
+    
+    # 2. Register handler for File > Open (to persist across file loads)
+    @persistent
+    def load_post_handler(dummy):
+        """Re-run activation after loading a file."""
+        # Use a small delay to let Blender fully stabilize context
+        bpy.app.timers.register(auto_activate_license, first_interval=1.0)
+        
+    bpy.app.handlers.load_post.append(load_post_handler)
 
 def unregister():
     """Unregisters all sub-modules in reverse order."""
