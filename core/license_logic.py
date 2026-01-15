@@ -110,6 +110,37 @@ def get_async_result():
     global _validation_result
     return _validation_result
 
+def _poll_activation_result():
+    """Timer callback to check for async validation results."""
+    res = get_async_result()
+    if res is None:
+        # Still running, check again in 0.5s
+        return 0.5
+    
+    # Validation finished
+    is_valid, msg, timestamp = res
+    if is_valid:
+        try:
+            # Sync to Scene state
+            scene = bpy.context.scene
+            if hasattr(scene, "sklum"):
+                scene.sklum.license_active = True
+                scene.sklum.license_message = msg
+                
+                # Also populate the scene property key from prefs for UI consistency
+                addon_name = __package__.split('.core')[0]
+                prefs = bpy.context.preferences.addons.get(addon_name)
+                if prefs:
+                    scene.sklum.license_key = prefs.preferences.license_key
+
+            logger.info(f"Auto-activation successful: {msg}")
+        except Exception as e:
+            logger.error(f"Failed to apply license state: {e}")
+    else:
+         logger.warning(f"Auto-activation failed: {msg}")
+         
+    return None # Stop timer
+
 def auto_activate_license():
     """
     Called by timer on startup. 
@@ -128,13 +159,13 @@ def auto_activate_license():
         if not key:
             return None
 
-        # Determine if we should validate (e.g., first time or cache expired)
-        # For simplicity, we auto-validate once per session
+        # Start async validation
         logger.info(f"Auto-activating license: {key[:4]}...")
         validate_license_async(key)
         
-        # Start a small timer or rely on the UI poll to pick up the result
-        # We also return None so the startup timer doesn't repeat
+        # Register a new separate timer for polling to be clean
+        bpy.app.timers.register(_poll_activation_result)
+        
         return None
     except Exception as e:
         logger.error(f"Error in auto_activate_license: {e}")
