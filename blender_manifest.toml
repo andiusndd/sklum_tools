@@ -11,6 +11,22 @@ blender_version_min = "4.2.0"
 license = ["GPL-2.0-or-later"]
 copyright = ["2026 Nguyen Duc Duong"]
 
+# Official standard for file exclusion (used by Blender's 'extension build' and our custom /export)
+paths_exclude_pattern = [
+    ".git/",
+    ".agent/",
+    ".gemini/",
+    "docs/",
+    "plans/",
+    "tests/",
+    "server_backend/",
+    "logs/",
+    "__pycache__/",
+    "*.zip",
+    "*.pyc",
+    "_export_addon.py"
+]
+
 [permissions]
 network = "Check for updates and download assets"
 files = "Export and import project files"
