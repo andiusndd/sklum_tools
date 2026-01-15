@@ -167,6 +167,18 @@ def auto_activate_license():
             else:
                 return None
 
+        # INSTANT UI UPDATE:
+        # Pre-fill the Scene Properties so the UI looks "Active/Busy" immediately, not Red.
+        try:
+            scene = bpy.context.scene
+            if hasattr(scene, "sklum"):
+                scene.sklum.license_key = key
+                scene.sklum.license_message = "Validating..."
+                # We don't set license_active = True yet, but the UI will see "Validating..." message
+                # and show a Yellow box instead of Red.
+        except:
+            pass
+
         # Start async validation
         logger.info(f"Auto-activating license: {key[:4]}...")
         validate_license_async(key)

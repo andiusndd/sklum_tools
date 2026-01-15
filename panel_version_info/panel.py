@@ -156,7 +156,8 @@ class VIEW3D_PT_sklum_version_info(Panel):
         if not scene.sklum.license_active:
             # Not activated - show activation form
             if scene.sklum.license_message == "Validating...":
-                license_box.label(text="Đang xác thực...", icon='UI_STATS')
+                license_box.label(text="Đang kiểm tra key...", icon='UI_STATS')
+                # Optional: Don't alert=True here so it's grey/default, not Red.
             else:
                 license_box.alert = True
                 license_box.label(text="⚠️ CHƯA KÍCH HOẠT LICENSE", icon='LOCKED')
