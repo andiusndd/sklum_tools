@@ -74,6 +74,8 @@ Khi nhận được `/export` hoặc `@[/export]`, Agent sẽ thực hiện quy 
             if '.git' in dirs: dirs.remove('.git')
             if '.gemini' in dirs: dirs.remove('.gemini')
             if '.agent' in dirs: dirs.remove('.agent')
+            if 'server_backend' in dirs: dirs.remove('server_backend')
+            if 'sklum-license-backend' in dirs: dirs.remove('sklum-license-backend')
             if '__pycache__' in dirs: dirs.remove('__pycache__')
             
             rel_path = os.path.relpath(root, cwd)
