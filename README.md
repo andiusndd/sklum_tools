@@ -1,54 +1,49 @@
 # SKLUM Tools – Blender Add-on
 
-**Tác giả:** AndiuS  
-**Phiên bản:** 2.5.4  
+**Author:** AndiuS  
+**Version:** 2.8.0  
 **Blender:** 4.2.0+  
-**Nguồn:** [https://github.com/andiusndd/sklum_tools](https://github.com/andiusndd/sklum_tools)
+**Source:** [https://github.com/andiusndd/sklum_tools](https://github.com/andiusndd/sklum_tools)
 
-SKLUM Tools cung cấp bộ tiện ích kiểm tra chất lượng mô hình (QA), tự động hoá đổi tên và hỗ trợ quy trình import/export dành cho pipeline sản xuất chuyên nghiệp.
+SKLUM Tools provides a suite of Quality Assurance (QA) utilities, automated renaming, and optimized import/export workflows for professional 3D production pipelines.
 
-## Mục lục
-- [SKLUM Tools – Blender Add-on](#sklum-tools--blender-add-on)
-  - [Mục lục](#mục-lục)
-  - [Cài đặt](#cài-đặt)
-  - [Tính năng nổi bật](#tính-năng-nổi-bật)
-  - [Cấu trúc dự án](#cấu-trúc-dự-án)
-  - [Lịch sử cập nhật](#lịch-sử-cập-nhật)
-  - [Đóng góp \& phát triển](#đóng-góp--phát-triển)
-  - [Giấy phép](#giấy-phép)
+---
 
-## Cài đặt
-1. Tải file `.zip` từ trang Releases.
-2. Mở Blender > `Edit → Preferences → Add-ons` > `Install...` và chọn file `.zip`.
-3. Tìm kiếm và kích hoạt add-on **SKLUM Tools**.
+## 📚 Documentation
+Please refer to the detailed documentation in the `docs/` folder:
+- [📖 Project Overview & PDR](docs/project-overview-pdr.md)
+- [🧩 Codebase Summary](docs/codebase-summary.md)
+- [🏗️ System Architecture](docs/system-architecture.md)
+- [📏 Code Standards](docs/code-standards.md)
+- [📁 Project Structure](STRUCTURE.md) (Legacy)
 
-Add-on xuất hiện tại `3D Viewport → Sidebar → SKLUM Tools`.
+---
 
-## Tính năng nổi bật
-*   **Check All:** Tổng hợp kiểm tra UV, seam/sharp, color space, modifier, vertex group... kết quả hiển thị trực quan thông qua mã màu và biểu tượng cảnh báo.
-*   **Auto Rename:** Quản lý tên Object/Material/Texture hàng loạt thông qua file CSV (IDP). Hỗ trợ hệ thống Preset mạnh mẽ để tùy chỉnh hậu tố (suffix).
+## 🚀 Key Features
+*   **Check All:** Comprehensive QA for UVs, Seams/Sharps, Color Space, Modifiers, and Vertex Groups with structured reporting.
+*   **License System:** Secure device-locking DRM to protect IP.
+*   **Auto Rename:** Batch rename Objects/Materials/Textures via CSV rules (IDP) with powerful Preset support.
 *   **Checker Tools:**
-    *   **Color Space:** Tự động sửa Color Space cho Texture (sRGB cho Diffuse, Non-Color cho RMA/Normal).
-    *   **Active Point:** Chuẩn hóa Origin về tâm và hỗ trợ Group-to-Empty nhanh chóng.
-    *   **Grid Checker:** Phát hiện các mặt lỗi (Triangles/N-gons) không mong muốn.
+    *   **Color Space:** Auto-fix Texture Color Space (sRGB/Non-Color).
+    *   **Active Point:** Origin normalization & Quick Group-to-Empty.
+    *   **Grid Checker:** Detect unwanted Triangles/N-gons.
 *   **Import/Export:** 
-    *   Export FBX/GLB với cấu hình tối ưu cho Engine.
-    *   Hỗ trợ Draco Compression và tùy chỉnh định dạng ảnh cho GLB.
-    *   Tính năng Pack/Unpack và Purge dữ liệu thừa.
-*   **JPG Converter:** Chuyển đổi texture PNG sang JPG để tối ưu dung lượng (Yêu cầu thư viện Pillow).
+    *   Optimized FBX/GLB export.
+    *   Draco Compression & Texture format customization.
+    *   Pack/Unpack & Data Purge tools.
+*   **JPG Converter:** Batch convert PNG textures to JPG (Requires Pillow).
 
-## Cấu trúc dự án
-Chi tiết về tổ chức mã nguồn có thể xem tại [STRUCTURE.md](STRUCTURE.md).
-- **`core/`**: Hằng số, tiện ích và các Scene properties dùng chung.
-- **`panel_*/`**: Các module panel riêng biệt cho từng nhóm tính năng.
+## 📥 Installation
+1.  Download the `.zip` file from Releases.
+2.  Open Blender > `Edit → Preferences → Add-ons` > `Install...` and select the `.zip`.
+3.  Search for and enable **SKLUM Tools**.
+4.  **Enter your License Key** in the sidebar to activate the tools.
 
-## Lịch sử cập nhật
-Xem chi tiết các thay đổi qua từng phiên bản tại [update-log.md](update-log.md).
+## 🛠️ Development
+See [Codebase Summary](docs/codebase-summary.md) for architecture details.
+- **`core/`**: Shared logic, DRM, and global properties.
+- **`panel_*/`**: Modular UI panels for specific feature groups.
+- **`server_backend/`**: Vercel/Supabase backend code (not included in Addon zip).
 
-## Đóng góp & phát triển
-1. Clone repo và mở thư mục `SKLUMToolz/`.
-2. Mọi operator/panel mới nên được đặt trong module panel phù hợp để đảm bảo tính modular.
-3. Khi sửa cấu trúc, cập nhật `STRUCTURE.md` và `README.md`.
-
-## Giấy phép
-Xem thông tin chi tiết trong repository GitHub.
+## 📜 Update Log
+See detailed changes in [update-log.md](update-log.md).
