@@ -36,7 +36,7 @@ class VIEW3D_PT_sklum_tools(Panel):
         # ONLY SHOW TOOLS IF ACTIVE
         # Header for active user
         row = layout.row()
-        row.label(text="License Active", icon='UNLOCK')
+        row.label(text="License Active", icon='UNLOCKED')
         row.operator("sklum.deactivate_license", text="", icon='X')
 
         layout.operator("sklum.check_all", text="Check All / Refresh", icon='FILE_REFRESH')
