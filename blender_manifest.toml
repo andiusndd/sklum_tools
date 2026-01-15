@@ -28,7 +28,7 @@ paths_exclude_pattern = [
     "*.pyc",
     "*.env",
     "vercel-import.env",
-    "_*.py"
+    "_export_*.py"
 ]
 
 [permissions]
