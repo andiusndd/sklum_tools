@@ -2,6 +2,11 @@
 import bpy
 from bpy.types import Operator
 from ...core import license_logic
+try:
+    from ...core.global_storage import save_license_key_global
+except ImportError:
+    # Fallback or direct import depending on structure
+    save_license_key_global = None
 
 class SKLUM_OT_activate_license(Operator):
     """Activate SKLUM Tools License"""
@@ -26,6 +31,13 @@ class SKLUM_OT_activate_license(Operator):
                 prefs.license_key = key
             except Exception as e:
                 print(f"Failed to save license key: {e}")
+            
+            # Explicitly save to Global Storage
+            if save_license_key_global:
+                try:
+                    save_license_key_global(key)
+                except Exception as e:
+                    print(f"Failed to save global key: {e}")
 
             self.report({'INFO'}, "License Activated!")
         else:
