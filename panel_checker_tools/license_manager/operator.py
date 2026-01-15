@@ -19,6 +19,14 @@ class SKLUM_OT_activate_license(Operator):
         scene.sklum_license_active = is_valid
         
         if is_valid:
+            # Save key to preferences
+            try:
+                package_name = __package__.split('.')[0]
+                prefs = context.preferences.addons[package_name].preferences
+                prefs.license_key = key
+            except Exception as e:
+                print(f"Failed to save license key: {e}")
+
             self.report({'INFO'}, "License Activated!")
         else:
             self.report({'ERROR'}, msg)
@@ -37,6 +45,15 @@ class SKLUM_OT_deactivate_license(Operator):
         scene.sklum_license_active = False
         scene.sklum_license_key = ""
         scene.sklum_license_message = "Đã gỡ license thành công."
+        
+        # Clear key from preferences
+        try:
+            package_name = __package__.split('.')[0]
+            prefs = context.preferences.addons[package_name].preferences
+            prefs.license_key = ""
+        except Exception as e:
+            print(f"Failed to clear license key: {e}")
+
         return {'FINISHED'}
 
 classes = (
