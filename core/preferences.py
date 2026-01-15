@@ -5,6 +5,14 @@ Addon Preferences - Centralized preference management for SKLUM Tools
 import bpy
 from bpy.types import AddonPreferences
 from bpy.props import StringProperty, FloatProperty, BoolProperty
+from .global_storage import save_license_key_global
+
+def _update_license_key(self, context):
+    """Callback to sync license key to global storage."""
+    # This ensures that whenever user types key or logic updates this prop, 
+    # it gets flushed to global persistent file.
+    if self.license_key:
+        save_license_key_global(self.license_key)
 
 
 class SKLUMToolsPreferences(AddonPreferences):
@@ -19,7 +27,8 @@ class SKLUMToolsPreferences(AddonPreferences):
         description="SKLUM Tools license key for activation",
         default="",
         subtype='PASSWORD',
-        options={'HIDDEN'}  # Removed SKIP_SAVE to allow persistence
+        options={'HIDDEN'},  # Removed SKIP_SAVE to allow persistence
+        update=_update_license_key
     )
     
     # CSV File Path for Auto Rename feature

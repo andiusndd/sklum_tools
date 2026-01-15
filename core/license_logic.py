@@ -147,6 +147,8 @@ def auto_activate_license():
     Attempts to activate using the key stored in preferences.
     """
     try:
+        from .global_storage import load_license_key_global
+        
         # Get the root addon package name
         addon_name = __package__.split('.core')[0]
         prefs = bpy.context.preferences.addons.get(addon_name)
@@ -157,7 +159,13 @@ def auto_activate_license():
         key = pref_data.license_key
 
         if not key:
-            return None
+            # Fallback: Check global storage
+            key = load_license_key_global()
+            if key:
+                logger.info("Found global license key, syncing to preferences...")
+                pref_data.license_key = key # This triggers the update callback, re-saving it, but that's fine/idempotent
+            else:
+                return None
 
         # Start async validation
         logger.info(f"Auto-activating license: {key[:4]}...")
