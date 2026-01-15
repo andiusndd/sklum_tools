@@ -134,6 +134,12 @@ def _poll_activation_result():
                     scene.sklum.license_key = prefs.preferences.license_key
 
             logger.info(f"Auto-activation successful: {msg}")
+            
+            # Force UI update immediately so user sees Green without moving mouse
+            for window in bpy.context.window_manager.windows:
+                for area in window.screen.areas:
+                    area.tag_redraw()
+                    
         except Exception as e:
             logger.error(f"Failed to apply license state: {e}")
     else:
