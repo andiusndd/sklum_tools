@@ -11,8 +11,7 @@ class SKLUMToolsPreferences(AddonPreferences):
     """Addon preferences for SKLUM Tools"""
     
     # This bl_idname must match the addon's package name
-    # Blender will automatically use __package__ when registering
-    bl_idname = __package__.split('.')[0]
+    bl_idname = __package__.split('.core')[0]
     
     # License Key
     license_key: StringProperty(

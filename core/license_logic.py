@@ -1,3 +1,4 @@
+import bpy
 import subprocess
 import requests
 import sys
@@ -108,3 +109,33 @@ def get_async_result():
     """Returns the result if the thread has finished, otherwise None."""
     global _validation_result
     return _validation_result
+
+def auto_activate_license():
+    """
+    Called by timer on startup. 
+    Attempts to activate using the key stored in preferences.
+    """
+    try:
+        # Get the root addon package name
+        addon_name = __package__.split('.core')[0]
+        prefs = bpy.context.preferences.addons.get(addon_name)
+        if not prefs:
+            return None
+        
+        pref_data = prefs.preferences
+        key = pref_data.license_key
+
+        if not key:
+            return None
+
+        # Determine if we should validate (e.g., first time or cache expired)
+        # For simplicity, we auto-validate once per session
+        logger.info(f"Auto-activating license: {key[:4]}...")
+        validate_license_async(key)
+        
+        # Start a small timer or rely on the UI poll to pick up the result
+        # We also return None so the startup timer doesn't repeat
+        return None
+    except Exception as e:
+        logger.error(f"Error in auto_activate_license: {e}")
+        return None
