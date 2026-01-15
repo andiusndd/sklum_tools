@@ -49,6 +49,13 @@ def unregister():
                     module.unregister()
         except Exception as e:
             print(f"SKLUM Tools: Error unregistering {sub_pkg_name}: {e}")
+            
+    # Shutdown logger to release file locks
+    try:
+        from .core.logger import logger
+        logger.shutdown()
+    except Exception as e:
+        print(f"SKLUM Tools: Error shutting down logger: {e}")
 
 if __name__ == "__main__":
     register()

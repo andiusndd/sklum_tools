@@ -1,6 +1,7 @@
+import bpy
+import tempfile
 import logging
 import os
-import bpy
 
 class SKLUM_Logger:
     _instance = None
@@ -30,18 +31,31 @@ class SKLUM_Logger:
 
         # File Handler
         try:
-            # We place logs in the addon directory/logs
-            addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            log_dir = os.path.join(addon_dir, "logs")
+            # We place logs in the SYSTEM TEMP directory to avoid file locking issues during updates
+            temp_dir = tempfile.gettempdir()
+            log_dir = os.path.join(temp_dir, "SKLUM_Logs")
             if not os.path.exists(log_dir):
                 os.makedirs(log_dir)
             
             log_file = os.path.join(log_dir, "sklum_tools.log")
+            
+            # Rotation or appending? Standard append.
             file_handler = logging.FileHandler(log_file, encoding='utf-8')
             file_handler.setFormatter(formatter)
             self._logger.addHandler(file_handler)
+            
+            # Store it for cleaning later if needed
+            self._file_handler = file_handler
         except Exception as e:
             print(f"Failed to setup file logging: {e}")
+
+    def shutdown(self):
+        """Closes all file handlers to release file locks."""
+        if self._logger:
+            handlers = self._logger.handlers[:]
+            for handler in handlers:
+                handler.close()
+                self._logger.removeHandler(handler)
 
     def info(self, msg):
         self._logger.info(msg)

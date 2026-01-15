@@ -83,8 +83,9 @@ class SKLUM_OT_open_log_file(Operator):
     bl_label = "Open Log File"
     
     def execute(self, context):
-        addon_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        log_file = os.path.join(addon_dir, "logs", "sklum_tools.log")
+        import tempfile
+        log_dir = os.path.join(tempfile.gettempdir(), "SKLUM_Logs")
+        log_file = os.path.join(log_dir, "sklum_tools.log")
         
         if os.path.exists(log_file):
             import subprocess
@@ -96,7 +97,7 @@ class SKLUM_OT_open_log_file(Operator):
                 subprocess.call(["xdg-open", log_file])
             return {'FINISHED'}
         else:
-            self.report({'WARNING'}, "Log file not found yet.")
+            self.report({'WARNING'}, f"Log file not found at {log_file}")
             return {'CANCELLED'}
 
 class VIEW3D_PT_sklum_version_info(Panel):
