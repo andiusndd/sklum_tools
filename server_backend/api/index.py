@@ -2,6 +2,7 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import os
+import socket
 import psycopg2
 from urllib.parse import parse_qs, urlparse
 
@@ -12,9 +13,26 @@ DB_USER = os.environ.get("SUPABASE_USER")
 DB_PASS = os.environ.get("SUPABASE_PASS")
 DB_PORT = os.environ.get("SUPABASE_PORT", "5432")
 
+def get_ipv4_address(hostname):
+    """
+    Force IPv4 resolution to avoid IPv6 connectivity issues on Vercel.
+    Falls back to hostname if resolution fails.
+    """
+    try:
+        # Get all addresses, filter for IPv4 only
+        addrs = socket.getaddrinfo(hostname, None, socket.AF_INET)
+        if addrs:
+            return addrs[0][4][0]  # Return first IPv4 address
+    except Exception:
+        pass
+    return hostname  # Fallback to original hostname
+
 def get_db_connection():
+    # Resolve hostname to IPv4 to avoid Vercel IPv6 issues
+    resolved_host = get_ipv4_address(DB_HOST) if DB_HOST else DB_HOST
+    
     return psycopg2.connect(
-        host=DB_HOST,
+        host=resolved_host,
         database=DB_NAME,
         user=DB_USER,
         password=DB_PASS,
