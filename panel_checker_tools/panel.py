@@ -15,6 +15,30 @@ class VIEW3D_PT_sklum_tools(Panel):
         layout = self.layout
         scene = context.scene
 
+        # LICENSE CHECK
+        if not scene.sklum_license_active:
+            box = layout.box()
+            box.alert = True
+            box.label(text="⚠️ CHƯA KÍCH HOẠT LICENSE", icon='LOCKED')
+            
+            box.prop(scene, "sklum_license_key")
+            
+            row = box.row(align=True)
+            row.operator("sklum.activate_license", text="Kích Hoạt", icon='KEY_COMMON')
+            
+            if scene.sklum_license_message:
+                box.label(text=scene.sklum_license_message, icon='INFO')
+                
+            box.separator()
+            box.label(text="Vui lòng kích hoạt để sử dụng.")
+            return # Stop drawing the rest of the panel
+
+        # ONLY SHOW TOOLS IF ACTIVE
+        # Header for active user
+        row = layout.row()
+        row.label(text="License Active", icon='UNLOCK')
+        row.operator("sklum.deactivate_license", text="", icon='X')
+
         layout.operator("sklum.check_all", text="Check All / Refresh", icon='FILE_REFRESH')
 
         # Prepare data for summary

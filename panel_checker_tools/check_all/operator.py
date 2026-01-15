@@ -18,6 +18,11 @@ class SKLUM_OT_check_all(Operator):
         return True
 
     def execute(self, context):
+        # LICENSE CHECK
+        if not context.scene.sklum_license_active:
+             self.report({'ERROR'}, "Vui lòng kích hoạt License để sử dụng.")
+             return {'CANCELLED'}
+
         # Call all individual check operators sequentially using hasattr for safety
         if hasattr(bpy.ops.sklum, 'check_seam'):
             bpy.ops.sklum.check_seam('EXEC_DEFAULT')

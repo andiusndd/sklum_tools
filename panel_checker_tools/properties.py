@@ -13,6 +13,9 @@ PROPERTY_NAMES = (
     "sklum_sharpness_angle",
     "sklum_check_all_result",
     "sklum_check_all_collapsed",
+    "sklum_license_key",
+    "sklum_license_active",
+    "sklum_license_message",
     "sklum_seam_check_result",
     "sklum_color_space_check_result",
     "sklum_active_point_check_result",
@@ -57,6 +60,18 @@ def register():
 
     Scene.sklum_check_all_result = StringProperty(name="Check All Result", default="")
     Scene.sklum_check_all_collapsed = BoolProperty(name="Collapse Check All", default=False)
+    
+    # License Properties
+    Scene.sklum_license_key = StringProperty(
+        name="License Key",
+        description="Nhập License Key để kích hoạt Addon",
+        subtype='PASSWORD'
+    )
+    Scene.sklum_license_active = BoolProperty(
+        name="License Active",
+        default=False
+    )
+    Scene.sklum_license_message = StringProperty(default="")
 
     Scene.sklum_seam_check_result = StringProperty(default="")
     Scene.sklum_color_space_check_result = StringProperty(default="")

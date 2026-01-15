@@ -12,6 +12,7 @@ from . import color_space
 from . import active_point
 from . import seam_sharp
 from . import grid_checker
+from . import license_manager # New
 
 
 modules = [
@@ -23,6 +24,7 @@ modules = [
     active_point,
     seam_sharp,
     grid_checker,
+    license_manager, # New
     panel,
 ]
 
